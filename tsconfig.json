@@ -10,6 +10,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
@@ -30,5 +31,12 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    // Deno-runtime files (npm: specifiers, Deno globals) — `supabase functions
+    // serve`/deploy type-check these; protocol.ts and scoring.ts stay pure and
+    // ARE checked here since app code and tests import them.
+    "supabase/functions/**/index.ts",
+    "supabase/functions/_shared/deno.ts"
+  ]
 }

@@ -383,6 +383,18 @@ allow_dynamic_registration = false
 
 [edge_runtime]
 enabled = true
+
+# Game functions do their own auth (console: user JWT + venue membership;
+# players: anonymous device keys) — gateway JWT verification would only
+# block the players the product exists for.
+[functions.advance-game]
+verify_jwt = false
+[functions.submit-answer]
+verify_jwt = false
+[functions.join-game]
+verify_jwt = false
+[functions.game-state]
+verify_jwt = false
 # Supported request policies: `oneshot`, `per_worker`.
 # `per_worker` (default) — enables hot reload during local development.
 # `oneshot` — fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).

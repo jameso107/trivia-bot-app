@@ -45,9 +45,13 @@ jobs:
           npx supabase status -o env > /tmp/supabase.env
           url=$(grep '^API_URL=' /tmp/supabase.env | cut -d'"' -f2)
           anon=$(grep '^ANON_KEY=' /tmp/supabase.env | cut -d'"' -f2)
-          test -n "$url" && test -n "$anon"
+          service=$(grep '^SERVICE_ROLE_KEY=' /tmp/supabase.env | cut -d'"' -f2)
+          test -n "$url" && test -n "$anon" && test -n "$service"
           echo "NEXT_PUBLIC_SUPABASE_URL=$url" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$anon" >> "$GITHUB_ENV"
+          # Test-harness only: seeds fixtures + audits results. The app never
+          # sees this key (CLAUDE.md hard rule).
+          echo "SUPABASE_SERVICE_ROLE_KEY=$service" >> "$GITHUB_ENV"
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
