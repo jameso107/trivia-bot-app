@@ -14,6 +14,10 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Supabase CLI scratch space (generated, minified)
     "supabase/.temp/**",
+    // Deno-runtime files (npm: specifiers, Deno globals) — checked by the
+    // Supabase CLI's Deno toolchain, not Node ESLint
+    "supabase/functions/**/index.ts",
+    "supabase/functions/_shared/deno.ts",
   ]),
 ]);
 
