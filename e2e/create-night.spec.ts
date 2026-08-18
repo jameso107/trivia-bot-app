@@ -30,6 +30,12 @@ test("a venue creates a night from the library and plays it", async ({
   const joinCode = (await hostPage.getByTestId("join-code").textContent())!.trim();
   expect(joinCode).toMatch(/^[A-HJ-NP-Z2-9]{4}$/);
 
+  // Dashboard-created games run the auto-host by default (the product bet).
+  // Pause it while still in the lobby (no dwell there) so the scripted part
+  // of this test stays deterministic; we resume it later to prove the engine.
+  await hostPage.keyboard.press("p");
+  await expect(hostPage.getByTestId("auto-status")).toHaveAttribute("data-paused", "true");
+
   // Two phones, two teams.
   const p1 = await newPlayer(browser, joinCode);
   await joinNewTeam(p1, "Norm", "Baseline");
@@ -52,6 +58,15 @@ test("a venue creates a night from the library and plays it", async ({
     timeout: 15000,
   });
   await expect(p2.getByTestId("reveal-verdict")).toContainText("Wrong");
+  await expect(hostPage.getByTestId("host-line")).toBeVisible();
+
+  // Resume the auto-host: with no clicks at all, the reveal dwell should
+  // carry the night to the next question by itself (M3's core bet).
+  await hostPage.keyboard.press("p");
+  await expect(hostPage.getByTestId("auto-status")).toHaveAttribute("data-paused", "false");
+  await expect(hostPage.getByTestId("console-state")).toHaveAttribute("data-state", "question", {
+    timeout: 20000,
+  });
 
   // The creation flow emitted its frozen event.
   const admin = adminClient();
