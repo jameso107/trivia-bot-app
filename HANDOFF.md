@@ -1,6 +1,6 @@
 # Build state — handoff notes
 
-*Updated 2026-08-17 night, after the first real bar run. Read PRD.md (spec) and
+*Updated 2026-08-18, all milestones M0–M7 shipped. Read PRD.md (spec) and
 CLAUDE.md (hard rules) first; this file is just "where we are."*
 
 ## Shipped and IN PRODUCTION (trivia-bot-app.vercel.app)
@@ -35,19 +35,24 @@ frozen §8 taxonomy audit. Flakes are P1s. Zero retries by doctrine.
   checklist. Functions deploy via `supabase functions deploy` or the MCP;
   SQL migrations do NOT ship them (this stranded a real console once).
 
-## Next milestones (PRD §10)
+## All milestones shipped (M0–M7)
 
-- **M4 — accounts & the save moment**: post-game phone stats (right/wrong,
-  fastest answer, team result), magic-link save → `profiles` +
-  `game_players.profile_id` link + `created_from_game` attribution +
-  `account_created_from_game` event, minimal `/me`. Gate: E2E saves an
-  account with correct attribution.
-- **M5 — venue dashboard complete**: first-run wizard (fires `venue_signup_completed`
-  + org `events` row), history/stats, settings toggles, custom pack request
-  (comped gate), promo-kit print page, feedback + dispute capture.
-  Gate: 10-minute signup→live-game E2E.
-- **M6 — org integration + ads scaffolding**; **M7 — hardening/handoff**
-  (150-player load, chaos pass, a11y, §9 Definition of Done).
+M4: save moment (stats → magic link → attributed profiles → /me).
+M5: venue dashboard (wizard + org wake-up row, history, settings, custom
+packs, promo kit + /v/{slug}, feedback + one-tap disputes).
+M6: ads scaffolding (pick_creative/impressions, sponsor slot, house cards),
+venue-health trigger, taxonomy CI gate (17 frozen events).
+M7: 150-player load test (150/150 joins p95 860ms, zero drops), 3G budget
+gate (prod build: 4.8s vs 10s allowed), chaos specs (console death mid-reveal,
+racing advances), axe a11y gate (caught+fixed light-mode white-on-white; app
+is deliberately dark-only now), 300-player join cap.
+
+Remaining to call the §9 Definition of Done fully closed:
+- Org daemon dry-run against the events row + contract (needs trivia-bot-org).
+- Owner to-dos: Sentry DSN + NEXT_PUBLIC_SITE_URL in Vercel, Supabase Pro
+  (free projects pause when idle — fatal for a bar night), custom SMTP before
+  real player volume, product domain.
+- M3's dwell timings and host-line copy iterate on real-night feedback.
 
 ## Owner to-dos (off-tool)
 
