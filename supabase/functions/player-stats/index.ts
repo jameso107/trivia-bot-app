@@ -3,7 +3,6 @@
 // frozen account_save_prompted event emits here (server-side, once per
 // player per game — resyncs must not double-count the funnel).
 import {
-  emitEvent,
   handleOptions,
   json,
   jsonError,
@@ -83,21 +82,15 @@ async function handle(req: Request): Promise<Response> {
   }
 
   // The prompt fires once per player per game (frozen taxonomy, PRD §8).
-  const { data: prompted } = await db
-    .from("analytics_events")
-    .select("id")
-    .eq("event", "account_save_prompted")
-    .eq("game_id", gameId)
-    .eq("player_id", playerId)
-    .limit(1);
-  if (!prompted || prompted.length === 0) {
-    await emitEvent(db, "account_save_prompted", {
-      game_id: gameId,
-      venue_id: game.venue_id,
-      team_id: player.team_id as string,
-      player_id: playerId,
-    });
-  }
+  // Atomic in SQL: concurrent fetches (double-mounts, two devices) can't
+  // double-count the funnel.
+  const { error: promptErr } = await db.rpc("emit_account_save_prompted", {
+    p_game_id: gameId,
+    p_venue_id: game.venue_id,
+    p_team_id: player.team_id,
+    p_player_id: playerId,
+  });
+  if (promptErr) console.error(`save-prompt emit failed: ${promptErr.message}`);
 
   return json({
     displayName: player.display_name,

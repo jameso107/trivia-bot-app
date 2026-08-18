@@ -17,6 +17,7 @@ import {
   type HostSlot,
   type LinePicker,
 } from "@/lib/game/host-lines";
+import { useCreative, useImpression } from "@/lib/game/use-creative";
 import type {
   GameStateName,
   LobbyEvent,
@@ -162,6 +163,17 @@ export function Console({
     }
   }, [gameId, state]);
 
+  // Sponsor slot (PRD §7): a screen creative in intermission + a strap on
+  // round intros, only when the venue opted in via settings.sponsor_slot.
+  const sponsorSlot = state?.settings.sponsor_slot === true;
+  const creative = useCreative(sponsorSlot ? gameId : null, "screen");
+  useImpression(
+    creative,
+    gameId,
+    sponsorSlot && state?.state === "intermission",
+    `intermission:${state?.round ?? 0}`,
+  );
+
   // The auto-host: each beat advances itself after its dwell.
   const autoHost = state ? state.settings.auto_host !== false : true;
   useEffect(() => {
@@ -266,7 +278,15 @@ export function Console({
         )}
 
         {state.state === "round_intro" && (
-          <h1 className="animate-beat-in text-7xl font-black">Round {state.round}</h1>
+          <div className="flex flex-col items-center gap-6">
+            <h1 className="animate-beat-in text-7xl font-black">Round {state.round}</h1>
+            {sponsorSlot && creative && (
+              <p className="text-2xl text-zinc-500" data-testid="sponsor-strap">
+                brought to you by{" "}
+                <span className="font-semibold text-zinc-300">{creative.headline}</span>
+              </p>
+            )}
+          </div>
         )}
 
         {(state.state === "question" || state.state === "final_question") &&
@@ -329,6 +349,18 @@ export function Console({
             <h1 className="text-6xl font-black">
               {state.state === "podium" ? "Final standings" : `Scores — round ${state.round}`}
             </h1>
+            {state.state === "intermission" && sponsorSlot && creative && (
+              <aside
+                data-testid="sponsor-panel"
+                className="flex w-full max-w-3xl flex-col gap-1 rounded-2xl border border-zinc-700 bg-zinc-900 px-8 py-5 text-center"
+              >
+                <p className="text-sm uppercase tracking-widest text-zinc-600">
+                  tonight&apos;s sponsor
+                </p>
+                <p className="text-4xl font-bold text-zinc-100">{creative.headline}</p>
+                {creative.body && <p className="text-2xl text-zinc-400">{creative.body}</p>}
+              </aside>
+            )}
             <ol className="w-full text-[36px]" data-testid="leaderboard">
               {state.leaderboard.map((t, i) => (
                 <li
