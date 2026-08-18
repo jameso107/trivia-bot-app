@@ -31,6 +31,10 @@ export interface ScoringAnswer {
   teamId: string;
   payload: unknown; // answers.payload as submitted
   submittedAtMs: number; // epoch ms, server clock
+  // Team's score entering the question. Only consulted on the final: the PRD
+  // has teams wager "0–100 OF THEIR POINTS", so the effective cap is
+  // min(100, what they actually have). Omitted => flat 0–100 cap.
+  teamScoreBefore?: number;
 }
 
 export interface TeamScore {
@@ -95,9 +99,14 @@ export function speedBonus(
   return Math.round(MAX_SPEED_BONUS * (clamped / timeLimitS));
 }
 
-export function clampWager(raw: unknown): number {
+export function wagerCap(teamScoreBefore: number | undefined): number {
+  if (teamScoreBefore === undefined) return MAX_WAGER;
+  return Math.min(MAX_WAGER, Math.max(0, Math.floor(teamScoreBefore)));
+}
+
+export function clampWager(raw: unknown, cap: number = MAX_WAGER): number {
   const n = typeof raw === "number" && Number.isFinite(raw) ? Math.trunc(raw) : 0;
-  return Math.min(Math.max(n, 0), MAX_WAGER);
+  return Math.min(Math.max(n, 0), cap);
 }
 
 // Scores one question for every team that answered. Teams that did not answer
@@ -107,11 +116,12 @@ export function scoreQuestion(
   answers: ScoringAnswer[],
   settings: ScoringSettings,
 ): TeamScore[] {
-  // Final question: wager only — correct adds, wrong subtracts (PRD §5).
+  // Final question: wager only — correct adds, wrong subtracts (PRD §5),
+  // capped at min(100, the team's points entering the final).
   if (question.isFinal) {
     return answers.map((a) => {
       const correct = isAnswerCorrect(question.format, question.answer, a.payload);
-      const wager = clampWager(asRecord(a.payload).wager);
+      const wager = clampWager(asRecord(a.payload).wager, wagerCap(a.teamScoreBefore));
       return { teamId: a.teamId, isCorrect: correct, points: correct ? wager : -wager };
     });
   }

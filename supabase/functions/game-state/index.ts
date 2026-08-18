@@ -8,13 +8,23 @@ import {
   jsonError,
   loadGame,
   loadGameByCode,
+  packIsLive,
   serviceClient,
 } from "../_shared/deno.ts";
+import { normalizeJoinCode } from "../_shared/join-code.ts";
 
 Deno.serve(async (req) => {
   const opt = handleOptions(req);
   if (opt) return opt;
+  try {
+    return await handle(req);
+  } catch (err) {
+    console.error("game-state crashed:", err);
+    return jsonError("internal error", 500);
+  }
+});
 
+async function handle(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const gameId = url.searchParams.get("gameId");
   const code = url.searchParams.get("code");
@@ -23,8 +33,13 @@ Deno.serve(async (req) => {
   const db = serviceClient();
   const game = gameId
     ? await loadGame(db, gameId)
-    : await loadGameByCode(db, code!.trim().toUpperCase());
+    : await loadGameByCode(db, normalizeJoinCode(code!));
   if (!game || game.state === "abandoned") return jsonError("game not found", 404);
 
+  // Live-pack hard rule (PRD §4), enforced pre-start — mirrors join-game.
+  if (game.state === "lobby" && !(await packIsLive(db, game.pack_id))) {
+    return jsonError("game not found", 404);
+  }
+
   return json(await buildProjection(db, game));
-});
+}

@@ -37,11 +37,13 @@ export function Console({
   const [state, setState] = useState<StatePayload | null>(null);
   const [tick, setTick] = useState<TickEvent | null>(null);
   const [lastJoined, setLastJoined] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const advancing = useRef(false);
 
   const onState = useCallback((s: StatePayload) => {
     setState(s);
     setTick(null);
+    setError(null);
   }, []);
   const onLobby = useCallback((e: LobbyEvent) => {
     setLastJoined(e.lastJoined);
@@ -64,11 +66,15 @@ export function Console({
       if (!token) return;
       const res = await advanceGame({ gameId, expectedState: state.state, accessToken: token });
       setState(res.state);
+      setError(null);
     } catch (err) {
-      if (err instanceof FnError && err.status === 409) {
-        const fresh = await getGameState({ gameId }).catch(() => null);
-        if (fresh) setState(fresh);
+      // 409 = someone else advanced (normal); anything else the host must SEE
+      // — a silent failure reads as a frozen game.
+      if (!(err instanceof FnError && err.status === 409)) {
+        setError(err instanceof Error ? err.message : "advance failed");
       }
+      const fresh = await getGameState({ gameId }).catch(() => null);
+      if (fresh) setState(fresh);
     } finally {
       advancing.current = false;
     }
@@ -242,6 +248,16 @@ export function Console({
           </h1>
         )}
       </section>
+
+      {error && (
+        <p
+          role="alert"
+          data-testid="console-error"
+          className="mx-auto rounded-lg border border-red-900 bg-red-950 px-4 py-2 text-xl text-red-300"
+        >
+          {error} — resynced; try again or check the wifi.
+        </p>
+      )}
 
       <footer className="flex items-center justify-between text-zinc-600">
         <span className="text-xl">

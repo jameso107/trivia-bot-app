@@ -178,6 +178,25 @@ describe("scoreQuestion — final wager", () => {
     ]);
   });
 
+  it("caps the wager at the team's points entering the final (PRD: 'of their points')", () => {
+    const scores = scoreQuestion(
+      finalQ,
+      [
+        { ...ans("t1", { choice: 0, wager: 100 }), teamScoreBefore: 20 }, // wrong, only has 20
+        { ...ans("t2", { choice: 1, wager: 100 }), teamScoreBefore: 850 }, // rich team still capped at 100
+        { ...ans("t3", { choice: 1, wager: 50 }), teamScoreBefore: 0 }, // broke team can only wager 0
+        { ...ans("t4", { choice: 1, wager: 80 }), teamScoreBefore: -30 }, // negative score => cap 0
+      ],
+      ON,
+    );
+    expect(scores).toEqual([
+      { teamId: "t1", isCorrect: false, points: -20 },
+      { teamId: "t2", isCorrect: true, points: 100 },
+      { teamId: "t3", isCorrect: true, points: 0 },
+      { teamId: "t4", isCorrect: true, points: 0 },
+    ]);
+  });
+
   it("never applies base or speed bonus on the final", () => {
     const scores = scoreQuestion(finalQ, [ans("t1", { choice: 1, wager: 10 }, 30)], ON);
     expect(scores).toEqual([{ teamId: "t1", isCorrect: true, points: 10 }]);
