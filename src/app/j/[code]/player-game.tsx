@@ -13,6 +13,7 @@ import {
 } from "@/lib/game/api";
 import { useGameChannel } from "@/lib/game/use-game-channel";
 import { createClient } from "@/lib/supabase/client";
+import { useCreative, useImpression } from "@/lib/game/use-creative";
 import { SaveMoment } from "./save-moment";
 import type {
   LobbyEvent,
@@ -143,6 +144,16 @@ export function PlayerGame({ code }: { code: string }) {
   // Subscribed from the moment we know the game (even pre-join, so the form's
   // team list stays live). Boot/join responses carried state already.
   useGameChannel(identity?.gameId ?? bootGameId, { onState, onLobby }, { skipFirstResync: true });
+
+  // Between rounds, one tasteful phone-surface card (house ads v1, PRD §7).
+  const betweenRounds = state?.state === "scores" || state?.state === "intermission";
+  const phoneCreative = useCreative(identity?.gameId ?? null, "phone");
+  useImpression(
+    phoneCreative,
+    identity?.gameId ?? null,
+    Boolean(betweenRounds),
+    `between:${state?.round ?? 0}`,
+  );
 
   async function handleJoin(formData: FormData) {
     setError(null);
@@ -318,6 +329,18 @@ export function PlayerGame({ code }: { code: string }) {
               <p className="text-lg text-zinc-300" data-testid="my-standing">
                 {myStanding.name}: #{myStanding.rank} · {myStanding.score} pts
               </p>
+            )}
+            {betweenRounds && phoneCreative && (
+              <aside
+                data-testid="phone-ad"
+                className="mt-2 rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left"
+              >
+                <p className="text-[10px] uppercase tracking-widest text-zinc-600">ad</p>
+                <p className="font-semibold text-zinc-200">{phoneCreative.headline}</p>
+                {phoneCreative.body && (
+                  <p className="text-sm text-zinc-400">{phoneCreative.body}</p>
+                )}
+              </aside>
             )}
           </div>
         )}
