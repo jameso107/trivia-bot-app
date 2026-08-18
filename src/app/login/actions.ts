@@ -15,9 +15,11 @@ export async function sendMagicLink(formData: FormData) {
   const origin =
     h.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+  // The redirect URL always carries a query string: the local email template
+  // appends &token_hash=... to it, and /auth/confirm routes on `next`.
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${origin}/auth/confirm` },
+    options: { emailRedirectTo: `${origin}/auth/confirm?next=/dashboard` },
   });
 
   if (error) {

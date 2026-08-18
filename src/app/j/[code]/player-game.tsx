@@ -12,6 +12,7 @@ import {
   type JoinResult,
 } from "@/lib/game/api";
 import { useGameChannel } from "@/lib/game/use-game-channel";
+import { SaveMoment } from "./save-moment";
 import type {
   LobbyEvent,
   StatePayload,
@@ -354,11 +355,7 @@ export function PlayerGame({ code }: { code: string }) {
           </div>
         )}
 
-        {state.state === "ended" && (
-          <div className="text-center text-xl text-zinc-300" data-testid="player-ended">
-            Good night! Post-game stats land in M4.
-          </div>
-        )}
+        {state.state === "ended" && identity && <SaveMoment identity={identity} />}
       </div>
     </Shell>
   );

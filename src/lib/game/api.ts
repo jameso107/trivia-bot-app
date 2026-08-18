@@ -91,3 +91,55 @@ export function advanceGame(params: {
     accessToken: params.accessToken,
   });
 }
+
+export interface PlayerStats {
+  displayName: string;
+  alreadySaved: boolean;
+  teamName: string | null;
+  rank: number | null;
+  score: number | null;
+  teamsTotal: number;
+  answered: number;
+  correct: number;
+  fastestSeconds: number | null;
+}
+
+export function playerStats(params: {
+  gameId: string;
+  playerId: string;
+  deviceKey: string;
+}): Promise<PlayerStats> {
+  return callFn("player-stats", { method: "POST", body: params });
+}
+
+export function completeSave(params: {
+  gameId: string;
+  playerId: string;
+  deviceKey: string;
+  accessToken: string;
+}): Promise<{ saved: boolean; newAccount: boolean }> {
+  return callFn("complete-save", {
+    method: "POST",
+    body: { gameId: params.gameId, playerId: params.playerId, deviceKey: params.deviceKey },
+    accessToken: params.accessToken,
+  });
+}
+
+export interface MeStats {
+  profile: { display_name: string; home_metro: string | null; created_at: string };
+  games: Array<{
+    gameId: string;
+    playedAt: string;
+    state: string;
+    packTitle: string;
+    teamName: string | null;
+    rank: number | null;
+    score: number | null;
+    teamsTotal: number;
+  }>;
+  totals: { games: number; correct: number; wins: number };
+}
+
+export function meStats(accessToken: string): Promise<MeStats> {
+  return callFn("me-stats", { method: "GET", accessToken });
+}
