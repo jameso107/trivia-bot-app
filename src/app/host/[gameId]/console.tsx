@@ -223,7 +223,7 @@ export function Console({
       {/* Hidden audio element: the TTS playback path (silent no-op without files) */}
       <audio ref={audioRef} className="hidden" />
 
-      <header className="flex items-center justify-between text-2xl text-zinc-500">
+      <header className="flex items-center justify-between text-2xl text-zinc-400">
         <span className="font-semibold uppercase tracking-widest text-amber-400">
           {state.packTitle || "Trivia Bot"}
         </span>
@@ -233,7 +233,7 @@ export function Console({
             data-paused={paused}
             className={`rounded-full border px-4 py-1 text-base uppercase tracking-widest ${
               !autoHost
-                ? "border-zinc-800 text-zinc-600"
+                ? "border-zinc-800 text-zinc-400"
                 : paused
                   ? "border-red-800 text-red-400"
                   : "border-zinc-700 text-zinc-400"
@@ -281,7 +281,7 @@ export function Console({
           <div className="flex flex-col items-center gap-6">
             <h1 className="animate-beat-in text-7xl font-black">Round {state.round}</h1>
             {sponsorSlot && creative && (
-              <p className="text-2xl text-zinc-500" data-testid="sponsor-strap">
+              <p className="text-2xl text-zinc-400" data-testid="sponsor-strap">
                 brought to you by{" "}
                 <span className="font-semibold text-zinc-300">{creative.headline}</span>
               </p>
@@ -354,7 +354,7 @@ export function Console({
                 data-testid="sponsor-panel"
                 className="flex w-full max-w-3xl flex-col gap-1 rounded-2xl border border-zinc-700 bg-zinc-900 px-8 py-5 text-center"
               >
-                <p className="text-sm uppercase tracking-widest text-zinc-600">
+                <p className="text-sm uppercase tracking-widest text-zinc-400">
                   tonight&apos;s sponsor
                 </p>
                 <p className="text-4xl font-bold text-zinc-100">{creative.headline}</p>
@@ -415,7 +415,7 @@ export function Console({
         </p>
       )}
 
-      <footer className="flex items-center justify-between text-zinc-600">
+      <footer className="flex items-center justify-between text-zinc-400">
         <span className="text-xl">
           Join: {joinUrl} · code {state.joinCode}
         </span>
@@ -426,7 +426,7 @@ export function Console({
             onClick={() => void advance()}
             className="rounded-xl border border-zinc-700 px-6 py-3 text-2xl text-zinc-300 hover:border-amber-400"
           >
-            {ADVANCE_LABEL[state.state] ?? "Advance"} <kbd className="ml-2 text-zinc-500">space</kbd>
+            {ADVANCE_LABEL[state.state] ?? "Advance"} <kbd className="ml-2 text-zinc-400">space</kbd>
           </button>
         )}
       </footer>
@@ -453,7 +453,7 @@ function RevealPanel({ state }: { state: StatePayload }) {
 
   return (
     <div className="flex w-full max-w-6xl flex-col items-center gap-8">
-      <p className="text-4xl text-zinc-500">{q.prompt}</p>
+      <p className="text-4xl text-zinc-400">{q.prompt}</p>
 
       {q.options && (
         <ol className="grid w-full grid-cols-2 gap-6 text-left text-[40px]">
@@ -465,10 +465,10 @@ function RevealPanel({ state }: { state: StatePayload }) {
                 className={`rounded-2xl border px-8 py-4 transition-all duration-500 ${
                   showAnswer && isCorrect
                     ? "border-emerald-400 bg-emerald-950 text-emerald-200"
-                    : "border-zinc-800 bg-zinc-900/60 text-zinc-500"
+                    : "border-zinc-800 bg-zinc-900/60 text-zinc-400"
                 }`}
               >
-                <span className={`mr-4 font-black ${showAnswer && isCorrect ? "text-emerald-300" : "text-zinc-600"}`}>
+                <span className={`mr-4 font-black ${showAnswer && isCorrect ? "text-emerald-300" : "text-zinc-400"}`}>
                   {String.fromCharCode(65 + i)}
                 </span>
                 {opt}
@@ -487,7 +487,7 @@ function RevealPanel({ state }: { state: StatePayload }) {
           {formatAnswer(state)}
         </h1>
         {reveal.answerNote && (
-          <p className="text-3xl text-zinc-500">{reveal.answerNote}</p>
+          <p className="text-3xl text-zinc-400">{reveal.answerNote}</p>
         )}
       </div>
 
@@ -503,7 +503,7 @@ function RevealPanel({ state }: { state: StatePayload }) {
             <span
               className={
                 !t.answered
-                  ? "text-zinc-600"
+                  ? "text-zinc-400"
                   : t.isCorrect
                     ? "text-emerald-400"
                     : "text-red-400"

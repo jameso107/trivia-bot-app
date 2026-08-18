@@ -295,7 +295,7 @@ export function PlayerGame({ code }: { code: string }) {
         data-testid="player-screen"
         data-state={state.state}
       >
-        <header className="flex items-center justify-between text-sm text-zinc-500">
+        <header className="flex items-center justify-between text-sm text-zinc-400">
           <span>{identity?.displayName}</span>
           <span data-testid="player-team">
             {state.teams.find((t) => t.id === identity?.teamId)?.name}
@@ -312,7 +312,7 @@ export function PlayerGame({ code }: { code: string }) {
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-bold">You&apos;re in!</h1>
             <p className="text-zinc-400">Watch the big screen — the night starts soon.</p>
-            <p className="text-sm text-zinc-500" data-testid="lobby-count">
+            <p className="text-sm text-zinc-400" data-testid="lobby-count">
               {state.playerCount} players · {state.teams.length} teams
             </p>
           </div>
@@ -335,7 +335,7 @@ export function PlayerGame({ code }: { code: string }) {
                 data-testid="phone-ad"
                 className="mt-2 rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left"
               >
-                <p className="text-[10px] uppercase tracking-widest text-zinc-600">ad</p>
+                <p className="text-[10px] uppercase tracking-widest text-zinc-400">ad</p>
                 <p className="font-semibold text-zinc-200">{phoneCreative.headline}</p>
                 {phoneCreative.body && (
                   <p className="text-sm text-zinc-400">{phoneCreative.body}</p>
@@ -533,14 +533,14 @@ function RevealCard({ state, identity }: { state: StatePayload; identity: Identi
           Challenge filed — a human ruling lands within 24h.
         </p>
       ) : challenge === "failed" ? (
-        <p className="text-sm text-zinc-500">Your team already challenged this one.</p>
+        <p className="text-sm text-zinc-400">Your team already challenged this one.</p>
       ) : (
         <button
           type="button"
           data-testid="challenge-button"
           onClick={() => void fileChallenge()}
           disabled={challenge === "filing"}
-          className="mx-auto text-sm text-zinc-500 underline decoration-dotted hover:text-amber-300 disabled:opacity-50"
+          className="mx-auto text-sm text-zinc-400 underline decoration-dotted hover:text-amber-300 disabled:opacity-50"
         >
           Think we&apos;re wrong? Challenge this question
         </button>

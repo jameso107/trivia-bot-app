@@ -61,7 +61,7 @@ export function FirstRunWizard({ error }: { error: string | null }) {
         <label className="flex flex-col gap-1 text-sm text-zinc-300">
           Your link name (goes on flyers — can&apos;t change later)
           <div className="flex items-center gap-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5">
-            <span className="text-zinc-500">/v/</span>
+            <span className="text-zinc-400">/v/</span>
             <input
               name="slug"
               required

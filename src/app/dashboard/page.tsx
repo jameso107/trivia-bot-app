@@ -64,7 +64,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             Trivia Bot
           </p>
           <h1 className="text-3xl font-bold text-zinc-50">Welcome</h1>
-          <p className="mt-1 text-sm text-zinc-500" data-testid="signed-in-as">
+          <p className="mt-1 text-sm text-zinc-400" data-testid="signed-in-as">
             Signed in as {user.email}
           </p>
         </header>
@@ -106,7 +106,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           <h1 className="text-3xl font-bold text-zinc-50" data-testid="venue-name">
             {venue.name}
           </h1>
-          <p className="mt-1 text-sm text-zinc-500" data-testid="signed-in-as">
+          <p className="mt-1 text-sm text-zinc-400" data-testid="signed-in-as">
             {venue.metro} · /v/{venue.slug} · {user.email}
           </p>
         </div>
@@ -142,7 +142,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold text-zinc-200">
           Pack library{" "}
-          <span className="text-sm font-normal text-zinc-500">— free, QA&apos;d, ready tonight</span>
+          <span className="text-sm font-normal text-zinc-400">— free, QA&apos;d, ready tonight</span>
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="pack-library">
           {(packs ?? []).map((pack) => (
@@ -153,7 +153,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             >
               <div className="flex flex-col gap-1">
                 <h3 className="text-lg font-bold text-zinc-50">{pack.title}</h3>
-                <p className="text-xs uppercase tracking-wider text-zinc-500">
+                <p className="text-xs uppercase tracking-wider text-zinc-400">
                   {pack.topic} · {pack.rounds} rounds · {pack.question_count} questions
                 </p>
                 {pack.description && <p className="text-sm text-zinc-400">{pack.description}</p>}
@@ -174,11 +174,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold text-zinc-200">Recent nights</h2>
         {nights.length === 0 ? (
-          <p className="text-sm text-zinc-500">No nights yet — your history builds here.</p>
+          <p className="text-sm text-zinc-400">No nights yet — your history builds here.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm" data-testid="night-history">
-              <thead className="text-xs uppercase tracking-wider text-zinc-500">
+              <thead className="text-xs uppercase tracking-wider text-zinc-400">
                 <tr>
                   <th className="py-2 pr-4">Date</th>
                   <th className="py-2 pr-4">Pack</th>
@@ -204,7 +204,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                       {n.state === "ended" ? (
                         n.state
                       ) : n.state === "abandoned" ? (
-                        <span className="text-zinc-600">{n.state}</span>
+                        <span className="text-zinc-400">{n.state}</span>
                       ) : (
                         <Link className="text-amber-400 underline" href={`/host/${n.game_id}`}>
                           {n.state} → console
@@ -239,7 +239,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 />
                 <span>
                   <span className="font-semibold text-zinc-200">{t.label}</span>
-                  <span className="block text-xs text-zinc-500">{t.hint}</span>
+                  <span className="block text-xs text-zinc-400">{t.hint}</span>
                 </span>
               </label>
             ))}

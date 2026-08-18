@@ -24,7 +24,7 @@ export default function Home() {
         >
           Run trivia at your bar
         </Link>
-        <span className="text-sm text-zinc-500">
+        <span className="text-sm text-zinc-400">
           Players: scan the QR on the big screen to join.
         </span>
       </div>

@@ -64,11 +64,11 @@ export default async function PromoPage() {
         data-testid="flyer"
         className="flex flex-col items-center gap-6 rounded-2xl border border-zinc-700 bg-white px-10 py-14 text-center text-zinc-900 print:min-h-screen print:justify-center print:rounded-none print:border-0"
       >
-        <p className="text-xl font-bold uppercase tracking-[0.3em] text-zinc-500">
+        <p className="text-xl font-bold uppercase tracking-[0.3em] text-zinc-400">
           Trivia night
         </p>
         <h2 className="text-5xl font-black leading-tight">{venue.name}</h2>
-        <p className="text-xl text-zinc-600">
+        <p className="text-xl text-zinc-400">
           Free to play · no app · join from your phone in 10 seconds
         </p>
         <div
@@ -77,7 +77,7 @@ export default async function PromoPage() {
           dangerouslySetInnerHTML={{ __html: qrSvg }}
         />
         <p className="font-mono text-2xl font-bold">{joinUrl}</p>
-        <p className="text-lg text-zinc-500">
+        <p className="text-lg text-zinc-400">
           Scan when the game is live — teams welcome, winners insufferable.
         </p>
       </section>

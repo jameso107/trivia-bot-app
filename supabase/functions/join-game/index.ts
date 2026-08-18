@@ -78,6 +78,16 @@ async function handle(req: Request): Promise<Response> {
 
   if (game.state === "ended") return jsonError("game is over", 410);
 
+  // Join-flood guard (M7): a packed bar is ~150 phones; hard-cap well above
+  // that so abuse can't mint unbounded rows while real rooms never notice.
+  const { count: playerCount } = await db
+    .from("game_players")
+    .select("id", { count: "exact", head: true })
+    .eq("game_id", game.id);
+  if ((playerCount ?? 0) >= 300) {
+    return jsonError("this game is full", 409, { reason: "game_full" });
+  }
+
   const displayName = cleanName(body.displayName);
   if (!displayName) return jsonError("pick a different name", 422);
 

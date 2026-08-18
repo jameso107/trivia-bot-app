@@ -81,6 +81,44 @@ to `live`.
   promote the previous deployment in the Vercel dashboard; migrations are
   additive so old code runs safely against a newer schema.
 
+## Hardening toolkit (M7)
+
+- **Load test**: `node scripts/load-test.mjs --players 150` against the local
+  stack — 150 simultaneous joins + a full question. Last run: 150/150 joins
+  (p95 860ms), exactly one stored answer per team, zero dropped broadcasts.
+- **3G budget**: `e2e/join-3g.spec.ts` throttles to regular-3G and enforces
+  the §3 join→answering <10s budget against production builds in CI.
+- **Chaos**: `e2e/chaos.spec.ts` kills the console mid-reveal (state restores,
+  scoring stays exactly-once) and races two advances (one 409s, state converges).
+- **Accessibility**: `e2e/a11y.spec.ts` axe-scans the public surfaces;
+  serious/critical violations fail CI. (This gate caught a real bug: the
+  scaffold's unlayered body background made light-mode phones white-on-white.)
+- **Taxonomy**: `scripts/audit-taxonomy.mjs` (CI gate) — all 17 product events
+  must emit in-suite with intact `game_completed` props.
+- Sample KPI query (kpi-definitions.md's players_per_night):
+  ```sql
+  select date_trunc('day', created_at) as day,
+         avg((props->>'players')::int) as players_per_night
+  from analytics_events where event = 'game_completed' group by 1 order by 1;
+  ```
+
+## §9 Definition of Done — status
+
+| Item | Status |
+|---|---|
+| CI green incl. synthetic night (production build) | ✅ every PR + main |
+| Pack ingested as `qa_pending` → hand-flipped `live` → played end-to-end | ✅ done in prod; played at a real bar 2026-08-17 |
+| Venue signup → org `events` row | ✅ (`signup_venue`), E2E-asserted; daemon dry-run pending trivia-bot-org build |
+| `analytics_events` populate + sane KPI query | ✅ taxonomy CI gate + query above |
+| RLS enabled, service role reserved for the daemon | ✅ deny-by-default; trusted paths are edge fns + SECURITY DEFINER RPCs |
+| Sentry wired | ✅ code-complete; DSN = owner to-do |
+| Runbook (local dev, migrations, deploy, rollback) | ✅ this file |
+| Every §7 acceptance criterion demonstrably passes | ✅ each has a named E2E gate |
+
+Owner to-dos still open: Sentry DSN + `NEXT_PUBLIC_SITE_URL` in Vercel,
+Supabase Pro upgrade (free projects pause when idle), custom SMTP before real
+player volume (built-in sender is rate-capped), product domain.
+
 ## Repo map
 
 ```
