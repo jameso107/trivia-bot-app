@@ -25,7 +25,15 @@ export interface SyntheticNight {
   questions: FixtureQuestion[];
 }
 
-export async function seedSyntheticNight(): Promise<SyntheticNight> {
+export interface VenueHost {
+  suffix: string;
+  venueId: string;
+  hostEmail: string;
+  hostUserId: string;
+}
+
+// Venue + signed-up host with membership — the starting point for any night.
+export async function seedVenueHost(): Promise<VenueHost> {
   const admin = adminClient();
   // Parallel workers seed simultaneously — a clock-based suffix collides.
   const suffix = crypto.randomUUID().slice(0, 8);
@@ -49,6 +57,14 @@ export async function seedSyntheticNight(): Promise<SyntheticNight> {
     .from("venue_members")
     .insert({ venue_id: venue.id, user_id: hostUserId, role: "owner" });
   if (memberErr) throw memberErr;
+
+  return { suffix, venueId: venue.id as string, hostEmail, hostUserId };
+}
+
+export async function seedSyntheticNight(): Promise<SyntheticNight> {
+  const admin = adminClient();
+  const { suffix, venueId, hostEmail, hostUserId } = await seedVenueHost();
+  const venue = { id: venueId };
 
   const { data: pack, error: packErr } = await admin
     .from("packs")

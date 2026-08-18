@@ -1,0 +1,651 @@
+{
+  "title": "Mitten State & The Midwest",
+  "topic": "Michigan & the Midwest",
+  "description": "4 rounds and a final wager on Michigan, metro Detroit, and the greater Midwest — coneys, Motown, muscle, and 1 gentle jab at Ohio.",
+  "rounds": 4,
+  "question_count": 41,
+  "difficulty_curve": [
+    2.2,
+    2.8,
+    3.2,
+    3.0
+  ],
+  "tags": [
+    "michigan",
+    "detroit",
+    "midwest",
+    "library"
+  ],
+  "questions": [
+    {
+      "round": 1,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "In The Wizard of Oz, Dorothy's farmhouse gets whisked away from which state?",
+      "options": [
+        "Nebraska",
+        "Oklahoma",
+        "Kansas",
+        "Missouri"
+      ],
+      "answer": 2,
+      "answer_note": "source: L. Frank Baum's novel and MGM's 1939 film — Dorothy Gale lives on a Kansas farm.",
+      "difficulty": 1,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Detroit's most famous coney rivalry pits Lafayette Coney Island against which next-door neighbor?",
+      "options": [
+        "American Coney Island",
+        "National Coney Island",
+        "Empire Coney Island",
+        "Duly's Place"
+      ],
+      "answer": 0,
+      "answer_note": "source: Detroit Historical Society — American (est. 1917) and Lafayette have shared the same W. Lafayette Blvd block for a century.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 3,
+      "format": "multiple_choice",
+      "prompt": "The classic mnemonic HOMES helps you remember which 5 things?",
+      "options": [
+        "Michigan's 5 biggest cities",
+        "The 5 Great Lakes",
+        "New York's 5 boroughs",
+        "The 5 Midwest capitals"
+      ],
+      "answer": 1,
+      "answer_note": "source: EPA Great Lakes atlas — Huron, Ontario, Michigan, Erie, Superior.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 4,
+      "format": "true_false",
+      "prompt": "To drive from downtown Detroit into Windsor, Canada, you head south.",
+      "options": null,
+      "answer": true,
+      "answer_note": "source: USGS maps — Windsor, Ontario sits due south of Detroit, across the Detroit River.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 5,
+      "format": "open_text",
+      "prompt": "Detroit's beloved Vernors is what flavor of soda?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "ginger ale",
+          "ginger",
+          "ginger soda",
+          "ginger beer"
+        ]
+      },
+      "answer_note": "source: Vernors (Keurig Dr Pepper) — Vernors is a barrel-aged ginger ale born in Detroit.",
+      "difficulty": 1,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "The Rock and Roll Hall of Fame opened in 1995 in which Great Lakes city?",
+      "options": [
+        "Chicago",
+        "Detroit",
+        "Buffalo",
+        "Cleveland"
+      ],
+      "answer": 3,
+      "answer_note": "source: Rock & Roll Hall of Fame — the museum opened on Cleveland's Lake Erie shore in September 1995.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 7,
+      "format": "multiple_choice",
+      "prompt": "The 1987 film RoboCop patrols a dystopian future version of which city?",
+      "options": [
+        "Chicago",
+        "Detroit",
+        "Los Angeles",
+        "New York"
+      ],
+      "answer": 1,
+      "answer_note": "source: Orion Pictures — RoboCop is set in a crime-ridden, near-future 'Old Detroit.'",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "Which Detroit team won back-to-back 1989 and 1990 championships as the 'Bad Boys'?",
+      "options": [
+        "Pistons",
+        "Red Wings",
+        "Tigers",
+        "Lions"
+      ],
+      "answer": 0,
+      "answer_note": "source: NBA — the 'Bad Boys' Pistons took the 1989 and 1990 NBA Finals.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "The Mall of America opened in 1992 in which state?",
+      "options": [
+        "Wisconsin",
+        "Illinois",
+        "Minnesota",
+        "Ohio"
+      ],
+      "answer": 2,
+      "answer_note": "source: City of Bloomington, Minnesota — the mega-mall opened just outside Minneapolis in 1992.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "The University of Michigan was founded in 1817 — 20 years before statehood — in which city?",
+      "options": [
+        "Ann Arbor",
+        "Detroit",
+        "Lansing",
+        "Monroe"
+      ],
+      "answer": 1,
+      "answer_note": "source: University of Michigan — founded 1817 in Detroit as the Catholepistemiad; it moved to Ann Arbor in 1837.",
+      "difficulty": 4,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "Legendary investor Warren Buffett is 'the Oracle of' which Midwest city?",
+      "options": [
+        "Des Moines",
+        "Omaha",
+        "Kansas City",
+        "Minneapolis"
+      ],
+      "answer": 1,
+      "answer_note": "source: Berkshire Hathaway — Buffett has lived and invested from Omaha, Nebraska since the 1950s.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Faygo's iconic Redpop is what flavor?",
+      "options": [
+        "Cherry",
+        "Fruit punch",
+        "Black cherry",
+        "Strawberry"
+      ],
+      "answer": 3,
+      "answer_note": "source: Faygo Beverages, Detroit since 1907 — Redpop is its famous strawberry soda.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 3,
+      "format": "number_closest",
+      "prompt": "In what year did Ford's Model T first go on sale?",
+      "options": null,
+      "answer": 1908,
+      "answer_note": "source: Ford Motor Co. — the first Model T rolled out of Detroit's Piquette Avenue plant in 1908.",
+      "difficulty": 3,
+      "time_limit_s": 35
+    },
+    {
+      "round": 2,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "Which future president grew up in Grand Rapids and snapped the ball for Michigan's football team?",
+      "options": [
+        "Ronald Reagan",
+        "Dwight Eisenhower",
+        "Gerald Ford",
+        "Herbert Hoover"
+      ],
+      "answer": 2,
+      "answer_note": "source: Gerald R. Ford Presidential Library — Ford played center for the Wolverines, 1932-34.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 5,
+      "format": "multiple_choice",
+      "prompt": "Historic Route 66 began its 2,448-mile run to Santa Monica in which Midwest city?",
+      "options": [
+        "Chicago",
+        "St. Louis",
+        "Detroit",
+        "Kansas City"
+      ],
+      "answer": 0,
+      "answer_note": "source: National Park Service Route 66 program — the Mother Road's eastern terminus was Chicago.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 6,
+      "format": "true_false",
+      "prompt": "Every US state flies a rectangular flag.",
+      "options": null,
+      "answer": false,
+      "answer_note": "source: Ohio Revised Code — Ohio's swallowtail 'burgee' is the only non-rectangular state flag. Even their flag cuts a corner.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 7,
+      "format": "open_text",
+      "prompt": "Minneapolis and St. Paul face each other across which river?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "Mississippi",
+          "Mississippi River",
+          "the Mississippi",
+          "the Mississippi River"
+        ]
+      },
+      "answer_note": "source: USGS — the Twin Cities grew up on opposite banks of the upper Mississippi River.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "Which state has stamped 'America's Dairyland' on its license plates since 1940?",
+      "options": [
+        "Minnesota",
+        "Wisconsin",
+        "Iowa",
+        "Ohio"
+      ],
+      "answer": 1,
+      "answer_note": "source: Wisconsin DOT — the slogan joined Wisconsin plates in 1940 and never left.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Motown legend Stevie Wonder was born in which Michigan city?",
+      "options": [
+        "Saginaw",
+        "Flint",
+        "Detroit",
+        "Grand Rapids"
+      ],
+      "answer": 0,
+      "answer_note": "source: Britannica — Stevie Wonder was born in Saginaw in 1950; his family moved to Detroit when he was 4.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "The 1984 Tigers started the season 35-5, then won the World Series over which team?",
+      "options": [
+        "Chicago Cubs",
+        "Los Angeles Dodgers",
+        "St. Louis Cardinals",
+        "San Diego Padres"
+      ],
+      "answer": 3,
+      "answer_note": "source: MLB — Detroit beat the San Diego Padres 4 games to 1; the Cubs had fallen to San Diego in the NLCS.",
+      "difficulty": 4,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "FDR's call for an 'Arsenal of Democracy' became the WWII nickname of which US city?",
+      "options": [
+        "Pittsburgh",
+        "Detroit",
+        "Chicago",
+        "Cleveland"
+      ],
+      "answer": 1,
+      "answer_note": "source: FDR's December 1940 fireside chat — Detroit's converted auto plants armed the Allies.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 2,
+      "format": "number_closest",
+      "prompt": "In feet, how tall is the Gateway Arch in St. Louis?",
+      "options": null,
+      "answer": 630,
+      "answer_note": "source: National Park Service — the Arch stands 630 feet tall and exactly 630 feet wide.",
+      "difficulty": 3,
+      "time_limit_s": 35
+    },
+    {
+      "round": 3,
+      "position": 3,
+      "format": "multiple_choice",
+      "prompt": "Immortalized in a 1976 Gordon Lightfoot ballad, the freighter Edmund Fitzgerald sank on which Great Lake?",
+      "options": [
+        "Superior",
+        "Huron",
+        "Michigan",
+        "Erie"
+      ],
+      "answer": 0,
+      "answer_note": "source: NOAA — the Fitzgerald went down in a Lake Superior storm on November 10, 1975, with all 29 crew.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "Tim Allen's sitcom Home Improvement, with its 'Tool Time' show, was set in which metro area?",
+      "options": [
+        "Chicago",
+        "Cleveland",
+        "Minneapolis",
+        "Detroit"
+      ],
+      "answer": 3,
+      "answer_note": "source: ABC (1991-99) — the Taylors lived in suburban Detroit, Lions and Wings jokes included.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 5,
+      "format": "open_text",
+      "prompt": "In Cincinnati, a '3-way' is chili, shredded cheese, and what underneath?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "spaghetti",
+          "pasta",
+          "noodles",
+          "spaghetti noodles"
+        ]
+      },
+      "answer_note": "source: Cincinnati's Empress chili parlors, since 1922 — a 3-way is spaghetti, chili, and a pile of cheddar.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "At its WWII peak, Ford's Willow Run plant finished 1 what per hour?",
+      "options": [
+        "Sherman tank",
+        "B-24 Liberator bomber",
+        "Jeep",
+        "P-51 Mustang fighter"
+      ],
+      "answer": 1,
+      "answer_note": "source: The Henry Ford — Willow Run hit 'a bomber an hour,' building 8,685 B-24 Liberators.",
+      "difficulty": 4,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 7,
+      "format": "true_false",
+      "prompt": "Lake Superior lies entirely within the United States.",
+      "options": null,
+      "answer": false,
+      "answer_note": "source: EPA — Superior straddles the Canadian border; Lake Michigan is the only all-American Great Lake.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "'If you build it, he will come.' The 1989 film Field of Dreams is set in which state?",
+      "options": [
+        "Iowa",
+        "Kansas",
+        "Nebraska",
+        "Indiana"
+      ],
+      "answer": 0,
+      "answer_note": "source: Universal Pictures — the movie was shot on a Dyersville, Iowa farm that fans still visit.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Schlitz, Pabst, and Miller all rose to fame brewing in which Midwest city?",
+      "options": [
+        "St. Louis",
+        "Cincinnati",
+        "Milwaukee",
+        "Chicago"
+      ],
+      "answer": 2,
+      "answer_note": "source: Milwaukee County Historical Society — Schlitz was literally 'the beer that made Milwaukee famous.'",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "The 'Belleville Three' — Atkins, May, and Saunderson — pioneered which music genre in 1980s metro Detroit?",
+      "options": [
+        "House",
+        "Techno",
+        "Trip-hop",
+        "Drum and bass"
+      ],
+      "answer": 1,
+      "answer_note": "source: Detroit Historical Museum — 3 Belleville schoolmates invented techno; house music belongs to Chicago.",
+      "difficulty": 5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 1,
+      "format": "open_text",
+      "prompt": "Which former featherweight boxer and auto-plant worker founded Motown Records in 1959?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "Berry Gordy",
+          "Berry Gordy Jr.",
+          "Berry Gordy Jr",
+          "Berry Gordy Junior",
+          "Gordy"
+        ]
+      },
+      "answer_note": "source: Motown Museum — Berry Gordy Jr. launched the label with an $800 family loan at 2648 W. Grand Blvd.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Miners from which corner of Britain brought the pasty to the Upper Peninsula?",
+      "options": [
+        "Wales",
+        "Scotland",
+        "Yorkshire",
+        "Cornwall"
+      ],
+      "answer": 3,
+      "answer_note": "source: Michigan Tech archives — Cornish miners packed pasties into UP copper and iron mines in the 1840s.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 3,
+      "format": "number_closest",
+      "prompt": "In what year did the Mackinac Bridge first open to traffic?",
+      "options": null,
+      "answer": 1957,
+      "answer_note": "source: Mackinac Bridge Authority — the 5-mile span opened November 1, 1957, uniting the 2 peninsulas.",
+      "difficulty": 3,
+      "time_limit_s": 35
+    },
+    {
+      "round": 4,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "Which Lansing native won the 1979 NCAA title with Michigan State before 5 NBA rings?",
+      "options": [
+        "Magic Johnson",
+        "Isiah Thomas",
+        "Glen Rice",
+        "Chris Webber"
+      ],
+      "answer": 0,
+      "answer_note": "source: NCAA/NBA — Magic Johnson beat Larry Bird's Indiana State in the 1979 final, then won 5 titles with the Lakers.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 5,
+      "format": "multiple_choice",
+      "prompt": "The 1955 Montgomery bus where Rosa Parks kept her seat is displayed in which Michigan city?",
+      "options": [
+        "Detroit",
+        "Lansing",
+        "Dearborn",
+        "Flint"
+      ],
+      "answer": 2,
+      "answer_note": "source: The Henry Ford, Dearborn — the museum restored the actual bus; Parks spent her later life in Detroit.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "Before Kitty Hawk, Wilbur and Orville Wright built their flyers in a bike shop in which Ohio city?",
+      "options": [
+        "Columbus",
+        "Dayton",
+        "Akron",
+        "Cincinnati"
+      ],
+      "answer": 1,
+      "answer_note": "source: NPS Dayton Aviation Heritage — the Wright Cycle Company operated in Dayton. Credit where due, Ohio.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 7,
+      "format": "true_false",
+      "prompt": "That '70s Show was set in the fictional town of Point Place, Wisconsin.",
+      "options": null,
+      "answer": true,
+      "answer_note": "source: Fox (1998-2006) — the Formans' basement sat in made-up Point Place, Wisconsin.",
+      "difficulty": 3,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "In DC Comics, Clark Kent grew up in Smallville, a farm town in which state?",
+      "options": [
+        "Kansas",
+        "Iowa",
+        "Nebraska",
+        "Ohio"
+      ],
+      "answer": 0,
+      "answer_note": "source: DC Comics — Smallville, Kansas has been Superman's hometown in canon since the 1970s.",
+      "difficulty": 2,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "In 1909, a stretch of Detroit's Woodward Avenue became the nation's first mile of what?",
+      "options": [
+        "Painted center lines",
+        "Streetcar track",
+        "Concrete road",
+        "Electric streetlights"
+      ],
+      "answer": 2,
+      "answer_note": "source: FHWA and Michigan historical marker — Woodward between 6 and 7 Mile was paved as America's first mile of concrete highway in 1909.",
+      "difficulty": 5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "After the near-bloodless 1835-36 'Toledo War,' Ohio kept Toledo and Michigan received what consolation prize?",
+      "options": [
+        "Belle Isle",
+        "The western Upper Peninsula",
+        "The Lake Erie islands",
+        "$500,000 in gold"
+      ],
+      "answer": 1,
+      "answer_note": "source: Michigan History Center — Michigan gave up the Toledo Strip for the western Upper Peninsula (the east was already its territory) plus 1837 statehood. The copper and iron say Michigan won.",
+      "difficulty": 4,
+      "time_limit_s": 30
+    },
+    {
+      "round": 5,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "Battle Creek's cereal boom started at the Kelloggs' sanitarium. Which former patient stayed in town and launched a rival cereal empire in 1895?",
+      "options": [
+        "Milton Hershey",
+        "Henry Crowell",
+        "C.W. Post",
+        "William Danforth"
+      ],
+      "answer": 2,
+      "answer_note": "source: Michigan History Center — C.W. Post, a Battle Creek Sanitarium patient in 1891, founded Postum Cereal there in 1895; Post cereals still bear his name.",
+      "difficulty": 4,
+      "time_limit_s": 45
+    }
+  ]
+}

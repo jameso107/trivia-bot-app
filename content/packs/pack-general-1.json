@@ -1,0 +1,475 @@
+{
+  "title": "Opening Night: General Knowledge",
+  "topic": "general",
+  "description": "Four rounds of crowd-pleasing general knowledge that ramp from warm-ups to cheer-worthy closers, capped by a final wager.",
+  "rounds": 4,
+  "question_count": 41,
+  "difficulty_curve": [2.2, 2.8, 3.2, 3.0],
+  "tags": ["general", "library"],
+  "questions": [
+    {
+      "round": 1,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "Guacamole is made primarily from which fruit?",
+      "options": ["Tomatillo", "Avocado", "Cucumber", "Green apple"],
+      "answer": 1,
+      "answer_note": "source: Encyclopaedia Britannica — guacamole is a mashed-avocado dip; the name comes from Nahuatl 'ahuacamolli', avocado sauce.",
+      "difficulty": 1.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "In The Wizard of Oz, what is the name of Dorothy's dog?",
+      "options": ["Rex", "Buddy", "Sparky", "Toto"],
+      "answer": 3,
+      "answer_note": "source: The Wizard of Oz (MGM, 1939) — Dorothy's Cairn Terrier is named Toto.",
+      "difficulty": 1.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 3,
+      "format": "multiple_choice",
+      "prompt": "The Beatles formed in which English city?",
+      "options": ["Liverpool", "London", "Manchester", "Birmingham"],
+      "answer": 0,
+      "answer_note": "source: The Beatles Story museum, Liverpool — the band formed in Liverpool in 1960.",
+      "difficulty": 1.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "Which element has the chemical symbol Au?",
+      "options": ["Gold", "Silver", "Aluminum", "Argon"],
+      "answer": 0,
+      "answer_note": "source: IUPAC periodic table — gold's symbol Au comes from the Latin 'aurum'; silver is Ag, aluminum Al, argon Ar.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 5,
+      "format": "multiple_choice",
+      "prompt": "What is the capital city of Australia?",
+      "options": ["Sydney", "Melbourne", "Canberra", "Perth"],
+      "answer": 2,
+      "answer_note": "source: Australian government — purpose-built Canberra became the capital as a 1913 compromise between rivals Sydney and Melbourne.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 6,
+      "format": "open_text",
+      "prompt": "What is the term for a word or phrase that reads the same forwards and backwards?",
+      "options": null,
+      "answer": {
+        "accept": ["palindrome", "a palindrome", "palindromes", "palindrom", "pallindrome"]
+      },
+      "answer_note": "source: Merriam-Webster — a palindrome reads the same backward as forward, e.g. 'racecar' or 'madam'.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 7,
+      "format": "true_false",
+      "prompt": "The Great Wall of China is visible to the naked eye from the Moon.",
+      "options": null,
+      "answer": false,
+      "answer_note": "source: NASA — Apollo astronauts confirmed no human-made structures, the Great Wall included, are visible unaided from the Moon.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "How many wives did King Henry VIII of England have?",
+      "options": ["4", "5", "6", "8"],
+      "answer": 2,
+      "answer_note": "source: Historic Royal Palaces — Henry VIII married 6 times between 1509 and 1543, from Catherine of Aragon to Catherine Parr.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Tequila must be made from which plant?",
+      "options": ["Sugarcane", "Corn", "Cactus", "Blue agave"],
+      "answer": 3,
+      "answer_note": "source: Mexican official standard (NOM) — tequila must be distilled from Weber blue agave, which is not a cactus.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "Which is the only letter of the alphabet that appears in no US state name?",
+      "options": ["J", "Q", "X", "Z"],
+      "answer": 1,
+      "answer_note": "source: the 50 US state names — every other letter appears somewhere: J in New Jersey, X in Texas, Z in Arizona; Q appears nowhere.",
+      "difficulty": 4.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "In the sitcom Friends, what is the name of the coffee shop where the gang hangs out?",
+      "options": ["The Daily Grind", "Central Perk", "Café Nervosa", "Java Junction"],
+      "answer": 1,
+      "answer_note": "source: Friends (NBC, 1994-2004) — Central Perk is the group's Manhattan coffee house; Café Nervosa is from Frasier.",
+      "difficulty": 1.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "What color jersey does the overall leader of the Tour de France wear?",
+      "options": ["Green", "Yellow", "White", "Polka dot"],
+      "answer": 1,
+      "answer_note": "source: Tour de France — the general-classification leader has worn the yellow jersey since 1919; green and polka dot mark other standings.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 3,
+      "format": "multiple_choice",
+      "prompt": "In Greek myth, who flew too close to the sun on wings of wax and feathers?",
+      "options": ["Daedalus", "Hermes", "Icarus", "Apollo"],
+      "answer": 2,
+      "answer_note": "source: Ovid's Metamorphoses — Icarus ignored his father Daedalus's warning; the sun melted his wax wings and he fell into the sea.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 4,
+      "format": "open_text",
+      "prompt": "What is the name of the symbol '&'?",
+      "options": null,
+      "answer": {
+        "accept": ["ampersand", "the ampersand", "amperstand", "ampersan"]
+      },
+      "answer_note": "source: Merriam-Webster — '&' is the ampersand, originally a ligature of the Latin word 'et' (and).",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 5,
+      "format": "number_closest",
+      "prompt": "How many keys are on a standard full-size piano?",
+      "options": null,
+      "answer": 88,
+      "answer_note": "source: Steinway & Sons — the modern standard piano has 88 keys: 52 white and 36 black.",
+      "difficulty": 3.0,
+      "time_limit_s": 35
+    },
+    {
+      "round": 2,
+      "position": 6,
+      "format": "true_false",
+      "prompt": "By law, bourbon whiskey must be made in the state of Kentucky.",
+      "options": null,
+      "answer": false,
+      "answer_note": "source: US federal regulations (27 CFR 5) — bourbon must be made in the United States, but any state qualifies, not just Kentucky.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 7,
+      "format": "multiple_choice",
+      "prompt": "Which artist painted The Scream?",
+      "options": ["Vincent van Gogh", "Gustav Klimt", "Salvador Dalí", "Edvard Munch"],
+      "answer": 3,
+      "answer_note": "source: National Museum of Norway — Norwegian artist Edvard Munch painted The Scream in 1893.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "Julius Caesar was assassinated on the Ides of which month?",
+      "options": ["March", "July", "October", "January"],
+      "answer": 0,
+      "answer_note": "source: Plutarch's Lives — Caesar was stabbed on the Ides of March, 15 March 44 BC.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Which technology takes its name from a 10th-century Viking king?",
+      "options": ["Bluetooth", "Wi-Fi", "USB", "HDMI"],
+      "answer": 0,
+      "answer_note": "source: Bluetooth SIG — the standard is named for King Harald 'Bluetooth' Gormsson; its logo combines his runic initials.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "Mars has exactly 2 moons. What are they called?",
+      "options": ["Io and Europa", "Titan and Enceladus", "Phobos and Deimos", "Charon and Nix"],
+      "answer": 2,
+      "answer_note": "source: NASA — Mars's moons Phobos and Deimos were discovered by Asaph Hall in 1877; the distractors orbit Jupiter, Saturn, and Pluto.",
+      "difficulty": 4.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "What was Disney's first full-length animated feature film, released in 1937?",
+      "options": ["Pinocchio", "Fantasia", "Bambi", "Snow White and the Seven Dwarfs"],
+      "answer": 3,
+      "answer_note": "source: Walt Disney Archives — Snow White and the Seven Dwarfs premiered in 1937; Pinocchio and Fantasia followed in 1940.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "In Norse mythology, what is the name of Thor's hammer?",
+      "options": ["Gungnir", "Mjölnir", "Gram", "Stormbreaker"],
+      "answer": 1,
+      "answer_note": "source: the Prose Edda — Thor wields the dwarf-forged hammer Mjölnir; Gungnir is Odin's spear and Stormbreaker exists only in Marvel films.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 3,
+      "format": "number_closest",
+      "prompt": "How many kilometers per second does light travel in a vacuum?",
+      "options": null,
+      "answer": 299792,
+      "answer_note": "source: SI definition (BIPM) — light in a vacuum travels exactly 299,792.458 km per second, a fixed defined constant.",
+      "difficulty": 3.0,
+      "time_limit_s": 35
+    },
+    {
+      "round": 3,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "In cricket, how many legal deliveries make up an over?",
+      "options": ["4", "5", "6", "8"],
+      "answer": 2,
+      "answer_note": "source: MCC Laws of Cricket — an over consists of 6 legal deliveries bowled from one end.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 5,
+      "format": "multiple_choice",
+      "prompt": "Who proposed the World Wide Web at CERN in 1989?",
+      "options": ["Alan Turing", "Charles Babbage", "Tim Berners-Lee", "James Dyson"],
+      "answer": 2,
+      "answer_note": "source: CERN — British scientist Tim Berners-Lee wrote the 1989 proposal for the World Wide Web while working there.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "Which Spanish artist painted the 1937 anti-war mural Guernica?",
+      "options": ["Salvador Dalí", "Joan Miró", "Francisco Goya", "Pablo Picasso"],
+      "answer": 3,
+      "answer_note": "source: Museo Reina Sofía, Madrid — Pablo Picasso painted Guernica in 1937; all four options are Spanish artists.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 7,
+      "format": "true_false",
+      "prompt": "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid of Giza.",
+      "options": null,
+      "answer": true,
+      "answer_note": "source: standard chronology — Great Pyramid c. 2560 BC, Cleopatra died 30 BC, Moon landing AD 1969: roughly 2,530 years versus 2,000.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "Which pasta's name means 'little worms' in Italian?",
+      "options": ["Vermicelli", "Linguine", "Orecchiette", "Farfalle"],
+      "answer": 0,
+      "answer_note": "source: Italian etymology — vermicelli is the diminutive of 'verme' (worm); linguine means little tongues, orecchiette little ears, farfalle butterflies.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 9,
+      "format": "open_text",
+      "prompt": "Which US state shares a land border with exactly 1 other US state?",
+      "options": null,
+      "answer": {
+        "accept": ["maine", "Maine", "main"]
+      },
+      "answer_note": "source: US Census Bureau geography — Maine borders only New Hampshire; every other bordered state touches at least 2.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "How many neck vertebrae does a giraffe have?",
+      "options": ["7", "12", "24", "33"],
+      "answer": 0,
+      "answer_note": "source: San Diego Zoo — giraffes have 7 cervical vertebrae, the same number as humans; each can be about 25 cm long.",
+      "difficulty": 4.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "What is the name of Elvis Presley's Memphis mansion?",
+      "options": ["Neverland", "Monticello", "Graceland", "Dollywood"],
+      "answer": 2,
+      "answer_note": "source: Graceland, Memphis — Elvis bought the mansion in 1957; it opened to the public in 1982.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Which planet has the hottest surface in our solar system?",
+      "options": ["Mercury", "Venus", "Mars", "Jupiter"],
+      "answer": 1,
+      "answer_note": "source: NASA — Venus's thick CO2 atmosphere keeps its surface near 465°C, hotter than Mercury despite being farther from the Sun.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 3,
+      "format": "multiple_choice",
+      "prompt": "Which author created the detective Sherlock Holmes?",
+      "options": ["Agatha Christie", "Charles Dickens", "Edgar Allan Poe", "Arthur Conan Doyle"],
+      "answer": 3,
+      "answer_note": "source: A Study in Scarlet (1887) — Arthur Conan Doyle introduced Sherlock Holmes in that novel.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 4,
+      "format": "true_false",
+      "prompt": "Nintendo was founded in the 1800s as a playing-card company.",
+      "options": null,
+      "answer": true,
+      "answer_note": "source: Nintendo company history — founded in Kyoto in 1889 by Fusajiro Yamauchi to make hanafuda playing cards.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 5,
+      "format": "number_closest",
+      "prompt": "In what year were the first modern Olympic Games held in Athens?",
+      "options": null,
+      "answer": 1896,
+      "answer_note": "source: International Olympic Committee — the first modern Olympiad was held in Athens in 1896.",
+      "difficulty": 3.0,
+      "time_limit_s": 35
+    },
+    {
+      "round": 4,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "The Wright brothers made their first powered flight in 1903 in which US state?",
+      "options": ["Ohio", "Virginia", "Kansas", "North Carolina"],
+      "answer": 3,
+      "answer_note": "source: Smithsonian — the Wright Flyer flew at Kill Devil Hills near Kitty Hawk, North Carolina, on 17 December 1903; the brothers were from Ohio.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 7,
+      "format": "multiple_choice",
+      "prompt": "Cinnamon is harvested from which part of a tree?",
+      "options": ["Its roots", "Its inner bark", "Its seeds", "Its flowers"],
+      "answer": 1,
+      "answer_note": "source: Encyclopaedia Britannica — cinnamon is the dried inner bark of Cinnamomum trees, which curls into quills as it dries.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "The 1942 film Casablanca is set during which war?",
+      "options": ["World War I", "The Spanish Civil War", "The Cold War", "World War II"],
+      "answer": 3,
+      "answer_note": "source: Casablanca (Warner Bros., 1942) — the film follows World War II refugees seeking exit visas in Vichy-controlled Morocco.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Napoleon Bonaparte died in 1821 in exile on which island?",
+      "options": ["Elba", "Corsica", "Saint Helena", "Sardinia"],
+      "answer": 2,
+      "answer_note": "source: Longwood House records — Napoleon died on Saint Helena on 5 May 1821; Elba was his first exile, Corsica his birthplace.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 10,
+      "format": "open_text",
+      "prompt": "Which river flows through the 4 capital cities Vienna, Bratislava, Budapest, and Belgrade?",
+      "options": null,
+      "answer": {
+        "accept": ["danube", "Danube", "the Danube", "Danube River", "River Danube", "Donau"]
+      },
+      "answer_note": "source: standard European geography — the Danube is the only river flowing through 4 national capitals: Vienna, Bratislava, Budapest, Belgrade.",
+      "difficulty": 4.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 5,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "Which of these events happened first?",
+      "options": [
+        "Signing of the Magna Carta",
+        "First recorded teaching at the University of Oxford",
+        "Founding of the Aztec capital Tenochtitlán",
+        "Start of construction of Notre-Dame in Paris"
+      ],
+      "answer": 1,
+      "answer_note": "source: University of Oxford — teaching existed there by 1096, before Notre-Dame construction began (1163), Magna Carta (1215), and Tenochtitlán's traditional founding (1325).",
+      "difficulty": 4.0,
+      "time_limit_s": 45
+    }
+  ]
+}

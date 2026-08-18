@@ -15,7 +15,8 @@
     "db:start": "supabase start -x studio,imgproxy,logflare,vector",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts"
+    "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts",
+    "seed:build": "node scripts/build-seed.mjs"
   },
   "engines": {
     "node": ">=22"
