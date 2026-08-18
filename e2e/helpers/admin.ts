@@ -46,9 +46,13 @@ export function adminClient(): SupabaseClient {
   return cached;
 }
 
-export function functionsBase(): string {
+export function supabaseUrl(): string {
   discoverLocalEnv();
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1`;
+  return process.env.NEXT_PUBLIC_SUPABASE_URL!;
+}
+
+export function functionsBase(): string {
+  return `${supabaseUrl()}/functions/v1`;
 }
 
 export function anonKey(): string {

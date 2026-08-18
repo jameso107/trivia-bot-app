@@ -36,7 +36,11 @@ export const EVT_LOBBY = "lobby"; // {playerCount, teams, lastJoined} in lobby
 
 // Convention (noted in M1 PR): a pack's final wager question is stored as
 // round = rounds + 1, position = 1. `rounds` on the packs row counts the
-// regular rounds only.
+// regular rounds only. THIS helper is the one place that encodes it.
+export function isFinalRound(round: number, regularRounds: number): boolean {
+  return round === regularRounds + 1;
+}
+
 export interface PackShape {
   rounds: number; // regular rounds (final excluded)
   positionsByRound: Record<number, number>; // round -> question count
@@ -55,7 +59,7 @@ export interface EnginePos {
 export function nextStep(cur: EnginePos, pack: PackShape): EnginePos | null {
   const { state, round, position } = cur;
   const finalRound = pack.rounds + 1;
-  const isFinal = round === finalRound;
+  const isFinal = isFinalRound(round, pack.rounds);
 
   switch (state) {
     case "lobby":
@@ -192,10 +196,11 @@ export interface LobbyEvent {
   lastJoined: string | null;
 }
 
+// Consoles already know the team total from state.teams — the tick only
+// carries what changes, sparing one count query per submission at rush hour.
 export interface TickEvent {
   questionId: string;
   answeredTeams: number;
-  totalTeams: number;
 }
 
 export function rankStandings(

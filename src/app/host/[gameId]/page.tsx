@@ -24,10 +24,14 @@ export default async function HostPage({ params }: PageProps<"/host/[gameId]">) 
     .maybeSingle();
   if (!game) notFound();
 
+  // Prefer the pinned canonical origin; header-derived origin is the fallback
+  // for local/preview. The QR every phone scans must never trust a spoofable
+  // Host header when a canonical origin exists.
   const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  const host = h.get("host") ?? "localhost:3000";
-  const joinUrl = `${proto}://${host}/j/${game.join_code}`;
+  const envOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
+  const headerOrigin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host") ?? "localhost:3000"}`;
+  const origin = envOrigin && envOrigin.startsWith("http") ? envOrigin : headerOrigin;
+  const joinUrl = `${origin}/j/${game.join_code}`;
 
   const qrSvg = await QRCode.toString(joinUrl, {
     type: "svg",

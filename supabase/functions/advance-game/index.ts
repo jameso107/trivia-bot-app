@@ -1,19 +1,27 @@
 // The ONE way the state machine moves (PRD §5): optimistic-concurrency swap
-// on the games row, side effects exactly once for the winner (scoring on
-// reveal, analytics on the way), then a full-state broadcast.
-// Caller must be a signed-in member of the game's venue.
+// on the games row. Caller must be a signed-in member of the game's venue.
+//
+// Crash-safety of reveals: scoring is applied BEFORE the swap through the
+// idempotent apply_reveal_scores RPC (one transaction; team totals recomputed
+// absolutely). Die after scoring but before the swap and the game is still
+// 'locked' — the retry re-scores (converging on identical values) and swaps.
+// Two racing consoles both score identically; one wins the swap; the loser
+// gets a clean 409.
 import {
   broadcastState,
+  currentQuestionRow,
   emitEvent,
   handleOptions,
   json,
   jsonError,
   loadGame,
+  packIsLive,
   packShapeFor,
   serviceClient,
   userFromRequest,
 } from "../_shared/deno.ts";
 import {
+  isFinalRound,
   nextStep,
   statesWithDeadline,
   type EnginePos,
@@ -25,7 +33,15 @@ Deno.serve(async (req) => {
   const opt = handleOptions(req);
   if (opt) return opt;
   if (req.method !== "POST") return jsonError("POST only", 405);
+  try {
+    return await handle(req);
+  } catch (err) {
+    console.error("advance-game crashed:", err);
+    return jsonError("internal error", 500);
+  }
+});
 
+async function handle(req: Request): Promise<Response> {
   const user = await userFromRequest(req);
   if (!user) return jsonError("sign in required", 401);
 
@@ -53,7 +69,8 @@ Deno.serve(async (req) => {
     return jsonError("state moved", 409, { actual: game.state });
   }
 
-  const { shape } = await packShapeFor(db, game.pack_id);
+  const shapeInfo = await packShapeFor(db, game.pack_id);
+  const { shape } = shapeInfo;
   const cur: EnginePos = {
     state: game.state as GameStateName,
     round: game.current_round,
@@ -61,6 +78,12 @@ Deno.serve(async (req) => {
   };
   const next = nextStep(cur, shape);
   if (!next) return jsonError("no legal transition from here", 422);
+
+  // Pre-start gate for the live-pack hard rule (PRD §4): a night can only
+  // START on a live pack. (Losing 'live' mid-game does not kill the night.)
+  if (cur.state === "lobby" && !(await packIsLive(db, game.pack_id))) {
+    return jsonError("this game's pack is not live", 422, { reason: "pack_not_live" });
+  }
 
   const nowIso = new Date().toISOString();
   const patch: Record<string, unknown> = {
@@ -72,13 +95,11 @@ Deno.serve(async (req) => {
   // Entering a timed state: load the question's limit and arm the clock.
   let enteringQuestionId: string | null = null;
   if (statesWithDeadline(next.state)) {
-    const { data: qRow } = await db
-      .from("pack_questions")
-      .select("id, time_limit_s")
-      .eq("pack_id", game.pack_id)
-      .eq("round", next.round)
-      .eq("position", next.position)
-      .maybeSingle();
+    const qRow = await currentQuestionRow(db, {
+      pack_id: game.pack_id,
+      current_round: next.round,
+      current_position: next.position,
+    });
     if (!qRow) return jsonError("pack has no question at that slot", 422);
     enteringQuestionId = qRow.id as string;
     patch.question_started_at = nowIso;
@@ -89,7 +110,78 @@ Deno.serve(async (req) => {
   if (cur.state === "lobby") patch.started_at = nowIso;
   if (next.state === "ended") patch.ended_at = nowIso;
 
-  // Optimistic concurrency: only the caller who saw the current tuple wins.
+  // ---- reveal: score idempotently BEFORE the swap ----
+  let revealQuestionId: string | null = null;
+  if (next.state === "reveal") {
+    const qRow = await currentQuestionRow(db, {
+      pack_id: game.pack_id,
+      current_round: next.round,
+      current_position: next.position,
+    });
+    if (!qRow) return jsonError("pack has no question at that slot", 422);
+    revealQuestionId = qRow.id as string;
+
+    const { data: answerRows, error: answersErr } = await db
+      .from("answers")
+      .select("id, team_id, payload, submitted_at")
+      .eq("game_id", game.id)
+      .eq("question_id", qRow.id as string);
+    if (answersErr) return jsonError(`could not load answers: ${answersErr.message}`, 500);
+
+    const isFinal = isFinalRound(next.round, shape.rounds);
+
+    // Wager cap needs each team's score ENTERING the final. Derive it from
+    // prior answers (not game_teams.score) so a reveal retry after a partial
+    // failure can't feed already-applied final points back into the cap.
+    let scoreBeforeByTeam = new Map<string, number>();
+    if (isFinal) {
+      const { data: priorRows } = await db
+        .from("answers")
+        .select("team_id, points")
+        .eq("game_id", game.id)
+        .neq("question_id", qRow.id as string)
+        .not("points", "is", null);
+      scoreBeforeByTeam = new Map();
+      for (const row of priorRows ?? []) {
+        const t = row.team_id as string;
+        scoreBeforeByTeam.set(t, (scoreBeforeByTeam.get(t) ?? 0) + Number(row.points));
+      }
+    }
+
+    const settings = (game.settings ?? {}) as { speed_bonus?: boolean };
+    const scoringAnswers: ScoringAnswer[] = (answerRows ?? []).map((a) => ({
+      teamId: a.team_id as string,
+      payload: a.payload,
+      submittedAtMs: Date.parse(a.submitted_at as string),
+      ...(isFinal
+        ? { teamScoreBefore: scoreBeforeByTeam.get(a.team_id as string) ?? 0 }
+        : {}),
+    }));
+    const results = scoreQuestion(
+      {
+        format: qRow.format as never,
+        answer: qRow.answer,
+        timeLimitS: qRow.time_limit_s as number,
+        deadlineMs: game.question_deadline ? Date.parse(game.question_deadline) : Date.now(),
+        isFinal,
+      },
+      scoringAnswers,
+      { speedBonus: settings.speed_bonus !== false },
+    );
+
+    const { error: rpcErr } = await db.rpc("apply_reveal_scores", {
+      p_game_id: game.id,
+      p_question_id: qRow.id as string,
+      p_scores: results.map((r) => ({
+        team_id: r.teamId,
+        is_correct: r.isCorrect,
+        points: r.points,
+      })),
+    });
+    if (rpcErr) return jsonError(`scoring failed: ${rpcErr.message}`, 500);
+  }
+
+  // ---- optimistic concurrency swap ----
   const { data: updated } = await db
     .from("games")
     .update(patch)
@@ -101,67 +193,14 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!updated) return jsonError("state moved", 409);
 
-  // ---- side effects, exactly once (we won the swap) ----
-
+  // ---- analytics (emitEvent never throws) ----
   if (next.state === "reveal") {
-    const { data: qRow } = await db
-      .from("pack_questions")
-      .select("id, format, answer, time_limit_s")
-      .eq("pack_id", game.pack_id)
-      .eq("round", next.round)
-      .eq("position", next.position)
-      .single();
-    const { data: answerRows } = await db
-      .from("answers")
-      .select("id, team_id, payload, submitted_at")
-      .eq("game_id", game.id)
-      .eq("question_id", qRow.id);
-
-    const settings = (updated.settings ?? {}) as { speed_bonus?: boolean };
-    const scoringAnswers: ScoringAnswer[] = (answerRows ?? []).map((a) => ({
-      teamId: a.team_id as string,
-      payload: a.payload,
-      submittedAtMs: Date.parse(a.submitted_at as string),
-    }));
-    const results = scoreQuestion(
-      {
-        format: qRow.format as never,
-        answer: qRow.answer,
-        timeLimitS: qRow.time_limit_s as number,
-        deadlineMs: Date.parse(updated.question_deadline as string),
-        isFinal: next.round === shape.rounds + 1,
-      },
-      scoringAnswers,
-      { speedBonus: settings.speed_bonus !== false },
-    );
-
-    const answerRowByTeam = new Map((answerRows ?? []).map((a) => [a.team_id as string, a]));
-    for (const r of results) {
-      const row = answerRowByTeam.get(r.teamId);
-      if (!row) continue;
-      await db
-        .from("answers")
-        .update({ is_correct: r.isCorrect, points: r.points })
-        .eq("id", row.id);
-      if (r.points !== 0) {
-        const { data: teamRow } = await db
-          .from("game_teams")
-          .select("score")
-          .eq("id", r.teamId)
-          .single();
-        await db
-          .from("game_teams")
-          .update({ score: Number(teamRow!.score ?? 0) + r.points })
-          .eq("id", r.teamId);
-      }
-    }
     await emitEvent(db, "question_revealed", { game_id: game.id, venue_id: game.venue_id }, {
-      question_id: qRow.id,
+      question_id: revealQuestionId,
       round: next.round,
       position: next.position,
     });
   }
-
   if (cur.state === "lobby" && next.state === "round_intro") {
     await emitEvent(db, "game_started", { game_id: game.id, venue_id: game.venue_id });
   }
@@ -188,6 +227,6 @@ Deno.serve(async (req) => {
     });
   }
 
-  const projection = await broadcastState(db, updated as never);
+  const projection = await broadcastState(db, updated as never, shapeInfo);
   return json({ ok: true, state: projection, enteringQuestionId });
-});
+}

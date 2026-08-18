@@ -3,7 +3,7 @@
 // The phone. Join → answer → see how your team is doing. Device credentials
 // live in localStorage so a dropped connection or closed tab resumes the same
 // player (PRD §3 resilience; answers stay idempotent via client uuids).
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FnError,
   getGameState,
@@ -26,6 +26,13 @@ interface Identity {
   displayName: string;
 }
 
+// One flag for "this question is settled for me", with why — the render and
+// every write path share it, so the UI can't disagree with itself.
+interface AnswerLock {
+  questionId: string;
+  by: "me" | "teammate" | "time";
+}
+
 const storageKey = (code: string) => `tb:player:${code}`;
 
 function loadIdentity(code: string): Identity | null {
@@ -37,14 +44,26 @@ function loadIdentity(code: string): Identity | null {
   }
 }
 
+function storeIdentity(code: string, id: Identity) {
+  // Private-mode/embedded browsers can refuse storage; the join itself
+  // already succeeded server-side, so never let persistence sink it —
+  // the session just won't survive a reload.
+  try {
+    localStorage.setItem(storageKey(code), JSON.stringify(id));
+  } catch {
+    /* non-fatal */
+  }
+}
+
 export function PlayerGame({ code }: { code: string }) {
   const [identity, setIdentity] = useState<Identity | null>(null);
+  const [bootGameId, setBootGameId] = useState<string | null>(null);
   const [state, setState] = useState<StatePayload | null>(null);
-  const [teams, setTeams] = useState<TeamSummary[]>([]);
+  const [formTeams, setFormTeams] = useState<TeamSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"boot" | "form" | "joining" | "in">("boot");
-  const [answeredQuestionId, setAnsweredQuestionId] = useState<string | null>(null);
-  const [teamLockedBy, setTeamLockedBy] = useState<string | null>(null);
+  const [lock, setLock] = useState<AnswerLock | null>(null);
+  const sendingRef = useRef(false);
 
   function applyJoin(res: JoinResult) {
     const id: Identity = {
@@ -54,24 +73,30 @@ export function PlayerGame({ code }: { code: string }) {
       deviceKey: res.deviceKey,
       displayName: res.displayName,
     };
-    localStorage.setItem(storageKey(code), JSON.stringify(id));
+    storeIdentity(code, id);
     setIdentity(id);
     setState(res.state);
-    setTeams(res.state.teams);
+    setFormTeams(res.state.teams);
     setPhase("in");
   }
 
-  // Boot: resume a stored identity or show the join form.
+  // Boot: resume a stored identity or show the join form (with live teams).
   useEffect(() => {
     const stored = loadIdentity(code);
     if (!stored) {
       getGameState({ code })
         .then((s) => {
-          setTeams(s.teams);
+          setState(s);
+          setBootGameId(s.gameId);
+          setFormTeams(s.teams);
           setPhase("form");
         })
         .catch((e) => {
-          setError(e instanceof FnError && e.status === 404 ? "No game with that code." : "Couldn't reach the game — try again.");
+          setError(
+            e instanceof FnError && e.status === 404
+              ? "No game with that code."
+              : "Couldn't reach the game — try again.",
+          );
           setPhase("form");
         });
       return;
@@ -81,7 +106,18 @@ export function PlayerGame({ code }: { code: string }) {
         applyJoin(res);
       })
       .catch(() => {
-        localStorage.removeItem(storageKey(code));
+        try {
+          localStorage.removeItem(storageKey(code));
+        } catch {
+          /* non-fatal */
+        }
+        getGameState({ code })
+          .then((s) => {
+            setState(s);
+            setBootGameId(s.gameId);
+            setFormTeams(s.teams);
+          })
+          .catch(() => {});
         setPhase("form");
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,11 +125,22 @@ export function PlayerGame({ code }: { code: string }) {
 
   const onState = useCallback((s: StatePayload) => {
     setState(s);
-    setTeams(s.teams);
-    setTeamLockedBy(null);
+    setFormTeams(s.teams);
+    // A lock only applies to the question it was placed on.
+    setLock((prev) =>
+      prev && s.question && prev.questionId === s.question.id ? prev : null,
+    );
   }, []);
-  const onLobby = useCallback((e: LobbyEvent) => setTeams(e.teams), []);
-  useGameChannel(identity?.gameId ?? null, { onState, onLobby });
+  const onLobby = useCallback((e: LobbyEvent) => {
+    setFormTeams(e.teams);
+    setState((prev) =>
+      prev ? { ...prev, playerCount: e.playerCount, teams: e.teams } : prev,
+    );
+  }, []);
+
+  // Subscribed from the moment we know the game (even pre-join, so the form's
+  // team list stays live). Boot/join responses carried state already.
+  useGameChannel(identity?.gameId ?? bootGameId, { onState, onLobby }, { skipFirstResync: true });
 
   async function handleJoin(formData: FormData) {
     setError(null);
@@ -115,9 +162,10 @@ export function PlayerGame({ code }: { code: string }) {
   }
 
   async function sendAnswer(payload: Record<string, unknown>) {
-    if (!identity || !state?.question) return;
+    if (!identity || !state?.question || sendingRef.current) return;
     const question = state.question;
-    setAnsweredQuestionId(question.id); // optimistic lock of the UI
+    sendingRef.current = true;
+    setLock({ questionId: question.id, by: "me" }); // optimistic
     try {
       await submitAnswer({
         answerId: crypto.randomUUID(),
@@ -129,13 +177,15 @@ export function PlayerGame({ code }: { code: string }) {
       });
     } catch (e) {
       if (e instanceof FnError && e.reason === "team_locked") {
-        setTeamLockedBy("a teammate");
+        setLock({ questionId: question.id, by: "teammate" });
       } else if (e instanceof FnError && e.reason === "too_late") {
-        setTeamLockedBy(null);
+        setLock({ questionId: question.id, by: "time" });
       } else {
-        setAnsweredQuestionId(null);
+        setLock(null);
         setError("That didn't go through — tap again.");
       }
+    } finally {
+      sendingRef.current = false;
     }
   }
 
@@ -145,7 +195,11 @@ export function PlayerGame({ code }: { code: string }) {
   }, [state, identity]);
 
   if (phase === "boot" || phase === "joining") {
-    return <Shell><p className="text-xl text-zinc-400">One sec…</p></Shell>;
+    return (
+      <Shell>
+        <p className="text-xl text-zinc-400">One sec…</p>
+      </Shell>
+    );
   }
 
   if (phase === "form") {
@@ -171,7 +225,7 @@ export function PlayerGame({ code }: { code: string }) {
               className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-3 text-lg"
             >
               <option value="__new__">Start a new team…</option>
-              {teams.map((t) => (
+              {formTeams.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name} ({t.playerCount})
                 </option>
@@ -203,33 +257,57 @@ export function PlayerGame({ code }: { code: string }) {
     );
   }
 
-  if (!state) return <Shell><p className="text-xl text-zinc-400">Syncing…</p></Shell>;
+  if (!state) {
+    return (
+      <Shell>
+        <p className="text-xl text-zinc-400">Syncing…</p>
+      </Shell>
+    );
+  }
 
   const q = state.question;
-  const answered = q !== null && answeredQuestionId === q.id;
   const isOpen = state.state === "question" || state.state === "final_question";
+  const activeLock = q && lock && lock.questionId === q.id ? lock : null;
+
+  const lockCopy: Record<AnswerLock["by"], { title: string; body: string }> = {
+    me: { title: "Locked in", body: "Answer is in — eyes on the screen." },
+    teammate: { title: "Locked in", body: "A teammate answered for your team." },
+    time: { title: "Time!", body: "Answers are locked for this one." },
+  };
 
   return (
     <Shell>
-      <div className="flex w-full flex-col gap-6" data-testid="player-screen" data-state={state.state}>
+      <div
+        className="flex w-full flex-col gap-6"
+        data-testid="player-screen"
+        data-state={state.state}
+      >
         <header className="flex items-center justify-between text-sm text-zinc-500">
           <span>{identity?.displayName}</span>
           <span data-testid="player-team">
-            {teams.find((t) => t.id === identity?.teamId)?.name}
+            {state.teams.find((t) => t.id === identity?.teamId)?.name}
           </span>
         </header>
+
+        {error && (
+          <p role="alert" className="text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
         {state.state === "lobby" && (
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-bold">You&apos;re in!</h1>
             <p className="text-zinc-400">Watch the big screen — the night starts soon.</p>
             <p className="text-sm text-zinc-500" data-testid="lobby-count">
-              {state.playerCount} players · {teams.length} teams
+              {state.playerCount} players · {state.teams.length} teams
             </p>
           </div>
         )}
 
-        {(state.state === "round_intro" || state.state === "intermission" || state.state === "scores") && (
+        {(state.state === "round_intro" ||
+          state.state === "intermission" ||
+          state.state === "scores") && (
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-bold">
               {state.state === "round_intro" ? `Round ${state.round}` : "Standings"}
@@ -242,20 +320,18 @@ export function PlayerGame({ code }: { code: string }) {
           </div>
         )}
 
-        {isOpen && q && !answered && !teamLockedBy && (
-          <AnswerForm
-            key={q.id}
-            question={q}
-            onSubmit={(payload) => void sendAnswer(payload)}
-          />
+        {isOpen && q && !activeLock && (
+          <AnswerForm key={q.id} question={q} onSubmit={(payload) => void sendAnswer(payload)} />
         )}
 
-        {isOpen && q && (answered || teamLockedBy) && (
+        {isOpen && q && activeLock && (
           <div className="flex flex-col gap-2 text-center" data-testid="answer-locked">
-            <h1 className="text-2xl font-bold text-emerald-400">Locked in</h1>
-            <p className="text-zinc-400">
-              {teamLockedBy ? `${teamLockedBy} answered for your team.` : "Answer is in — eyes on the screen."}
-            </p>
+            <h1
+              className={`text-2xl font-bold ${activeLock.by === "time" ? "text-zinc-300" : "text-emerald-400"}`}
+            >
+              {lockCopy[activeLock.by].title}
+            </h1>
+            <p className="text-zinc-400">{lockCopy[activeLock.by].body}</p>
           </div>
         )}
 
@@ -304,7 +380,7 @@ function AnswerForm({
 
       {question.isFinal && (
         <label className="flex flex-col gap-1 text-sm text-zinc-300">
-          Wager (0–100)
+          Wager (0–100, up to what your team has)
           <input
             type="number"
             min={0}
@@ -366,7 +442,10 @@ function AnswerForm({
             className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-3 text-lg"
             placeholder="Closest number wins"
           />
-          <button type="submit" className="rounded-xl bg-amber-400 px-4 py-3 text-lg font-bold text-zinc-950">
+          <button
+            type="submit"
+            className="rounded-xl bg-amber-400 px-4 py-3 text-lg font-bold text-zinc-950"
+          >
             Lock it in
           </button>
         </form>
@@ -386,7 +465,10 @@ function AnswerForm({
             className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-3 text-lg"
             placeholder="Type your answer"
           />
-          <button type="submit" className="rounded-xl bg-amber-400 px-4 py-3 text-lg font-bold text-zinc-950">
+          <button
+            type="submit"
+            className="rounded-xl bg-amber-400 px-4 py-3 text-lg font-bold text-zinc-950"
+          >
             Lock it in
           </button>
         </form>

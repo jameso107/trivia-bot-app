@@ -13,8 +13,10 @@ import {
   acceptsAnswers,
   EVT_STATE,
   gameChannel,
+  isFinalRound,
   rankStandings,
   type GameSettings,
+  type PackShape,
   type PublicQuestion,
   type RevealInfo,
   type StatePayload,
@@ -144,12 +146,25 @@ export async function loadGameByCode(db: SupabaseClient, code: string): Promise<
   return (data as GameRow | null) ?? null;
 }
 
-export async function packShapeFor(db: SupabaseClient, packId: string) {
+export interface ShapeInfo {
+  title: string;
+  shape: PackShape;
+}
+
+// Pack CONTENT is immutable once a pack is live (only trivia-qa flips status,
+// never questions), so the shape is safe to cache for the life of this edge
+// runtime instance. Pack STATUS is deliberately NOT cached — see packIsLive.
+const shapeCache = new Map<string, ShapeInfo>();
+
+export async function packShapeFor(db: SupabaseClient, packId: string): Promise<ShapeInfo> {
+  const cached = shapeCache.get(packId);
+  if (cached) return cached;
+
   const { data: pack } = await db
     .from("packs")
     .select("title, rounds")
     .eq("id", packId)
-    .single();
+    .maybeSingle();
   const { data: qs } = await db
     .from("pack_questions")
     .select("round, position")
@@ -159,13 +174,35 @@ export async function packShapeFor(db: SupabaseClient, packId: string) {
   let hasFinal = false;
   for (const row of qs ?? []) {
     const r = row.round as number;
-    if (r === rounds + 1) hasFinal = true;
+    if (isFinalRound(r, rounds)) hasFinal = true;
     else positionsByRound[r] = Math.max(positionsByRound[r] ?? 0, row.position as number);
   }
-  return { title: (pack?.title as string) ?? "", shape: { rounds, positionsByRound, hasFinal } };
+  const info: ShapeInfo = {
+    title: (pack?.title as string) ?? "",
+    shape: { rounds, positionsByRound, hasFinal },
+  };
+  if (pack) shapeCache.set(packId, info);
+  return info;
 }
 
-async function currentQuestionRow(db: SupabaseClient, game: GameRow) {
+// HARD RULE (PRD §4 / CLAUDE.md): packs with status != 'live' are never
+// surfaced. The service role bypasses the RLS policy that enforces this for
+// the API roles, so trusted code checks explicitly. Enforced at the pre-start
+// boundary (join/state/start of lobby games); a pack losing 'live' MID-game
+// does not kill a running night — noted product decision.
+export async function packIsLive(db: SupabaseClient, packId: string): Promise<boolean> {
+  const { data } = await db
+    .from("packs")
+    .select("status")
+    .eq("id", packId)
+    .maybeSingle();
+  return data?.status === "live";
+}
+
+export async function currentQuestionRow(
+  db: SupabaseClient,
+  game: { pack_id: string; current_round: number; current_position: number },
+) {
   const { data } = await db
     .from("pack_questions")
     .select("id, round, position, format, prompt, options, answer, answer_note, time_limit_s")
@@ -176,20 +213,66 @@ async function currentQuestionRow(db: SupabaseClient, game: GameRow) {
   return data;
 }
 
-// Build the client-safe projection. `includeReveal` controls whether the
-// canonical answer ships (true only in the reveal state).
-export async function buildProjection(db: SupabaseClient, game: GameRow): Promise<StatePayload> {
+interface TeamRow {
+  id: string;
+  name: string;
+  score: number | string | null;
+}
+
+// Reveal payload: the ONLY projection that carries the canonical answer.
+async function buildRevealInfo(
+  db: SupabaseClient,
+  game: GameRow,
+  questionRow: Record<string, unknown>,
+  teamRows: TeamRow[],
+): Promise<RevealInfo> {
+  const { data: answerRows } = await db
+    .from("answers")
+    .select("team_id, is_correct, points, payload")
+    .eq("game_id", game.id)
+    .eq("question_id", questionRow.id as string);
+  const byTeam = new Map((answerRows ?? []).map((a) => [a.team_id as string, a]));
+  return {
+    questionId: questionRow.id as string,
+    answer: questionRow.answer,
+    answerNote: (questionRow.answer_note as string | null) ?? null,
+    teamResults: teamRows.map((t) => {
+      const a = byTeam.get(t.id);
+      const wagerRaw =
+        a && typeof a.payload === "object" && a.payload !== null
+          ? (a.payload as Record<string, unknown>).wager
+          : null;
+      return {
+        teamId: t.id,
+        name: t.name,
+        answered: Boolean(a),
+        isCorrect: a ? (a.is_correct as boolean | null) : null,
+        points: a ? Number(a.points ?? 0) : 0,
+        wager: typeof wagerRaw === "number" ? wagerRaw : null,
+      };
+    }),
+  };
+}
+
+// Build the client-safe projection. The canonical answer ships only in the
+// reveal state, via buildRevealInfo. Callers that already resolved the pack
+// shape (advance-game) pass it through to avoid a duplicate lookup.
+export async function buildProjection(
+  db: SupabaseClient,
+  game: GameRow,
+  preloadedShape?: ShapeInfo,
+): Promise<StatePayload> {
   const [{ title, shape }, teamsRes, playersRes] = await Promise.all([
-    packShapeFor(db, game.pack_id),
+    preloadedShape ? Promise.resolve(preloadedShape) : packShapeFor(db, game.pack_id),
     db.from("game_teams").select("id, name, score").eq("game_id", game.id),
     db.from("game_players").select("id, team_id").eq("game_id", game.id),
   ]);
 
-  const teamRows = teamsRes.data ?? [];
+  const teamRows = (teamsRes.data ?? []) as unknown as TeamRow[];
   const playerRows = playersRes.data ?? [];
   const teams: TeamSummary[] = teamRows.map((t) => ({
-    id: t.id as string,
-    name: t.name as string,
+    id: t.id,
+    name: t.name,
     playerCount: playerRows.filter((p) => p.team_id === t.id).length,
   }));
 
@@ -210,36 +293,11 @@ export async function buildProjection(db: SupabaseClient, game: GameRow): Promis
         prompt: row.prompt as string,
         options: (row.options as string[] | null) ?? null,
         timeLimitS: row.time_limit_s as number,
-        isFinal: game.current_round === shape.rounds + 1,
+        isFinal: isFinalRound(game.current_round, shape.rounds),
       };
 
       if (game.state === "reveal") {
-        const { data: answerRows } = await db
-          .from("answers")
-          .select("team_id, is_correct, points, payload")
-          .eq("game_id", game.id)
-          .eq("question_id", row.id);
-        const byTeam = new Map((answerRows ?? []).map((a) => [a.team_id as string, a]));
-        reveal = {
-          questionId: row.id as string,
-          answer: row.answer,
-          answerNote: (row.answer_note as string | null) ?? null,
-          teamResults: teamRows.map((t) => {
-            const a = byTeam.get(t.id as string);
-            const wagerRaw =
-              a && typeof a.payload === "object" && a.payload !== null
-                ? (a.payload as Record<string, unknown>).wager
-                : null;
-            return {
-              teamId: t.id as string,
-              name: t.name as string,
-              answered: Boolean(a),
-              isCorrect: a ? (a.is_correct as boolean | null) : null,
-              points: a ? Number(a.points ?? 0) : 0,
-              wager: typeof wagerRaw === "number" ? wagerRaw : null,
-            };
-          }),
-        };
+        reveal = await buildRevealInfo(db, game, row, teamRows);
       }
     }
   }
@@ -257,8 +315,8 @@ export async function buildProjection(db: SupabaseClient, game: GameRow): Promis
     reveal,
     leaderboard: rankStandings(
       teamRows.map((t) => ({
-        teamId: t.id as string,
-        name: t.name as string,
+        teamId: t.id,
+        name: t.name,
         score: Number(t.score ?? 0),
       })),
     ),
@@ -270,8 +328,12 @@ export async function buildProjection(db: SupabaseClient, game: GameRow): Promis
   };
 }
 
-export async function broadcastState(db: SupabaseClient, game: GameRow): Promise<StatePayload> {
-  const projection = await buildProjection(db, game);
+export async function broadcastState(
+  db: SupabaseClient,
+  game: GameRow,
+  preloadedShape?: ShapeInfo,
+): Promise<StatePayload> {
+  const projection = await buildProjection(db, game, preloadedShape);
   await broadcast(gameChannel(game.id), EVT_STATE, projection);
   return projection;
 }

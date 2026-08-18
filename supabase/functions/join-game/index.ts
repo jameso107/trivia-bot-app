@@ -9,30 +9,26 @@ import {
   json,
   jsonError,
   loadGameByCode,
+  packIsLive,
   serviceClient,
 } from "../_shared/deno.ts";
 import { EVT_LOBBY, gameChannel } from "../_shared/protocol.ts";
-
-const NAME_MAX = 24;
-// v1 blocklist — team/player names shown on a public TV (PRD: profanity-
-// filtered). The org's content ops can harden this later without a deploy by
-// moving it to a table; for launch a coarse net beats nothing.
-const BLOCKLIST = ["fuck", "shit", "cunt", "nigg", "fagg", "rape", "hitler"];
-
-function cleanName(raw: unknown): string | null {
-  if (typeof raw !== "string") return null;
-  const name = raw.replace(/\s+/g, " ").trim().slice(0, NAME_MAX);
-  if (name.length < 1) return null;
-  const lower = name.toLowerCase();
-  if (BLOCKLIST.some((w) => lower.includes(w))) return null;
-  return name;
-}
+import { cleanName } from "../_shared/moderation.ts";
+import { normalizeJoinCode } from "../_shared/join-code.ts";
 
 Deno.serve(async (req) => {
   const opt = handleOptions(req);
   if (opt) return opt;
   if (req.method !== "POST") return jsonError("POST only", 405);
+  try {
+    return await handle(req);
+  } catch (err) {
+    console.error("join-game crashed:", err);
+    return jsonError("internal error", 500);
+  }
+});
 
+async function handle(req: Request): Promise<Response> {
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -40,12 +36,18 @@ Deno.serve(async (req) => {
     return jsonError("invalid JSON", 400);
   }
 
-  const code = typeof body.code === "string" ? body.code.trim().toUpperCase() : "";
+  const code = typeof body.code === "string" ? normalizeJoinCode(body.code) : "";
   if (!code) return jsonError("missing code", 400);
 
   const db = serviceClient();
   const game = await loadGameByCode(db, code);
   if (!game || game.state === "abandoned") return jsonError("game not found", 404);
+
+  // Live-pack hard rule (PRD §4), enforced pre-start: a lobby game on a
+  // non-live pack does not exist as far as players are concerned.
+  if (game.state === "lobby" && !(await packIsLive(db, game.pack_id))) {
+    return jsonError("game not found", 404);
+  }
 
   // Reconnect path: an existing player re-presents their device credentials.
   if (typeof body.playerId === "string" && typeof body.deviceKey === "string") {
@@ -109,8 +111,9 @@ Deno.serve(async (req) => {
         .select("id")
         .eq("game_id", game.id)
         .eq("name", teamName)
-        .single();
-      teamId = existing!.id as string;
+        .maybeSingle();
+      if (!existing) return jsonError("could not create team — try again", 500);
+      teamId = existing.id as string;
     } else {
       return jsonError(insErr?.message ?? "could not create team", 500);
     }
@@ -155,4 +158,4 @@ Deno.serve(async (req) => {
     rejoined: false,
     state,
   });
-});
+}

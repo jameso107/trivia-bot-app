@@ -24,6 +24,14 @@ jobs:
       - run: npm run typecheck
       - run: npm run test
 
+      # Edge functions are Deno code excluded from tsc/eslint — check them
+      # with the runtime that actually executes them.
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check edge functions (Deno)
+        run: deno check supabase/functions/*/index.ts
+
   e2e:
     name: Playwright · local Supabase
     runs-on: ubuntu-latest

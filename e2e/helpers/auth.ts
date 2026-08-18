@@ -1,7 +1,7 @@
 // Sign a seeded host into a browser context via an admin-generated magic
 // link token — the same /auth/confirm path production links travel.
 import type { Page } from "@playwright/test";
-import { adminClient } from "./admin";
+import { adminClient, anonKey, supabaseUrl } from "./admin";
 
 export async function loginAsHost(page: Page, email: string): Promise<void> {
   const admin = adminClient();
@@ -25,11 +25,9 @@ export async function hostAccessToken(email: string): Promise<string> {
   });
   if (error) throw error;
   const { createClient } = await import("@supabase/supabase-js");
-  const anon = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { auth: { persistSession: false } },
-  );
+  const anon = createClient(supabaseUrl(), anonKey(), {
+    auth: { persistSession: false },
+  });
   const { data: verified, error: verifyErr } = await anon.auth.verifyOtp({
     type: "email",
     token_hash: data.properties.hashed_token,

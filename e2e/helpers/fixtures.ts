@@ -27,7 +27,8 @@ export interface SyntheticNight {
 
 export async function seedSyntheticNight(): Promise<SyntheticNight> {
   const admin = adminClient();
-  const suffix = Date.now().toString(36);
+  // Parallel workers seed simultaneously — a clock-based suffix collides.
+  const suffix = crypto.randomUUID().slice(0, 8);
 
   const { data: venue, error: venueErr } = await admin
     .from("venues")
