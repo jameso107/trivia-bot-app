@@ -4,14 +4,23 @@ import { createClient } from "@/lib/supabase/server";
 
 // Magic-link landing. Handles both verification shapes:
 //  * token_hash + type — links from templates using {{ .TokenHash }}
-//    (works cross-device; local templates are set up this way)
+//    (works cross-device; local templates append it to the redirect URL)
 //  * code — default hosted templates via the PKCE flow (same-browser)
+// `next` decides where a verified user lands (dashboard, the save-moment
+// completion, ...). Relative paths only — anything absolute is dropped so the
+// emailed link can never bounce a session to a foreign origin.
+function safeNext(raw: string | null): string {
+  if (!raw) return "/dashboard";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
+  return raw;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = safeNext(searchParams.get("next"));
 
   const supabase = await createClient();
 
