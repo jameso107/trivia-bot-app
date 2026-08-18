@@ -72,6 +72,9 @@ test("signup → first live game, with every M5 surface exercised", async ({ pag
   await p2.goto("/dashboard/promo");
   await expect(p2.getByTestId("flyer")).toContainText(venueName);
   await p2.getByTestId("print-flyer").click(); // headless print is a no-op; the event isn't
+  await expect(p2.getByTestId("print-flyer")).toHaveAttribute("data-logged", "true", {
+    timeout: 15000,
+  });
   await p2.goto(`/v/${expectedSlug}`);
   await p2.waitForURL(/\/j\//, { timeout: 20000 }); // flyer QR → live game
   await expect(p2.getByTestId("join-form")).toBeVisible({ timeout: 15000 });
