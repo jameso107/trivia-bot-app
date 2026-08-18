@@ -54,6 +54,23 @@ synthetic-night E2E (M1) becomes the deploy gate — flaky tests are P1 bugs.
   the org daemon. Apply migrations to cloud with the Supabase MCP/CLI as part
   of a release, never by hand-editing the dashboard.
 
+### Releasing to prod — the checklist
+
+A release is THREE deploys, not one (learned the hard way when the console
+sat at "Warming up" in a real bar):
+
+1. **App** — merging `main` auto-deploys via Vercel.
+2. **SQL** — apply new `supabase/migrations/*` to the cloud project (MCP/CLI)
+   and record their versions in `supabase_migrations.schema_migrations`.
+3. **Edge functions** — any change under `supabase/functions/` must be
+   deployed (`supabase functions deploy <name>` or the MCP
+   `deploy_edge_function`, including the `_shared/*` files, `verify_jwt`
+   false). The app calls these at runtime; SQL migrations do NOT ship them.
+
+Pack content follows the §9 ritual: ingest as `qa_pending`
+(`node scripts/build-seed.mjs --status qa_pending --stdout`), QA, then flip
+to `live`.
+
 ## Deploy & rollback
 
 - Vercel builds every PR into a preview deploy; `main` deploys to production.
