@@ -12,6 +12,7 @@ import {
   type JoinResult,
 } from "@/lib/game/api";
 import { useGameChannel } from "@/lib/game/use-game-channel";
+import { createClient } from "@/lib/supabase/client";
 import { SaveMoment } from "./save-moment";
 import type {
   LobbyEvent,
@@ -341,7 +342,7 @@ export function PlayerGame({ code }: { code: string }) {
         )}
 
         {state.state === "reveal" && state.reveal && identity && (
-          <RevealCard state={state} teamId={identity.teamId} />
+          <RevealCard state={state} identity={identity} />
         )}
 
         {state.state === "podium" && myStanding && (
@@ -474,19 +475,53 @@ function AnswerForm({
   );
 }
 
-function RevealCard({ state, teamId }: { state: StatePayload; teamId: string }) {
-  const mine = state.reveal!.teamResults.find((t) => t.teamId === teamId);
+function RevealCard({ state, identity }: { state: StatePayload; identity: Identity }) {
+  const [challenge, setChallenge] = useState<"idle" | "filing" | "filed" | "failed">("idle");
+  const reveal = state.reveal!;
+  const mine = reveal.teamResults.find((t) => t.teamId === identity.teamId);
   const verdict = !mine?.answered
     ? { text: "No answer this time", cls: "text-zinc-400" }
     : mine.isCorrect
       ? { text: `Correct! +${mine.points}`, cls: "text-emerald-400" }
       : { text: mine.points < 0 ? `Wrong — ${mine.points}` : "Wrong — 0", cls: "text-red-400" };
+
+  async function fileChallenge() {
+    if (challenge !== "idle") return;
+    setChallenge("filing");
+    const supabase = createClient();
+    const { error } = await supabase.rpc("file_dispute", {
+      p_game_id: identity.gameId,
+      p_question_id: reveal.questionId,
+      p_player_id: identity.playerId,
+      p_device_key: identity.deviceKey,
+    });
+    setChallenge(error ? "failed" : "filed");
+  }
+
   return (
     <div className="flex flex-col gap-2 text-center" data-testid="reveal-card">
       <h1 className={`text-3xl font-black ${verdict.cls}`} data-testid="reveal-verdict">
         {verdict.text}
       </h1>
       <p className="text-zinc-400">Answer + source on the big screen.</p>
+      {/* The one-tap challenge (PRD §4): lands in trivia-qa's dispute queue. */}
+      {challenge === "filed" ? (
+        <p className="text-sm text-amber-300" data-testid="challenge-filed">
+          Challenge filed — a human ruling lands within 24h.
+        </p>
+      ) : challenge === "failed" ? (
+        <p className="text-sm text-zinc-500">Your team already challenged this one.</p>
+      ) : (
+        <button
+          type="button"
+          data-testid="challenge-button"
+          onClick={() => void fileChallenge()}
+          disabled={challenge === "filing"}
+          className="mx-auto text-sm text-zinc-500 underline decoration-dotted hover:text-amber-300 disabled:opacity-50"
+        >
+          Think we&apos;re wrong? Challenge this question
+        </button>
+      )}
     </div>
   );
 }

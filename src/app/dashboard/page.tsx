@@ -1,15 +1,48 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { startGame } from "./actions";
+import {
+  requestCustomPack,
+  startGame,
+  submitVenueFeedback,
+  updateVenueSettings,
+} from "./actions";
+import { FirstRunWizard } from "./wizard";
 
 export const metadata = { title: "Dashboard — Trivia Bot" };
 
-// The venue dashboard, M2 shape: browse the live library, start a night.
-// (First-run wizard, history, settings, promo kit: M5.) RLS means this page
-// can only ever see live packs — the hard rule is enforced below this code.
+interface Night {
+  game_id: string;
+  created_at: string;
+  state: string;
+  pack_title: string;
+  join_code: string;
+  players: number;
+  teams: number;
+  winner: string | null;
+  duration_s: number | null;
+}
+
+const TOGGLES: Array<{ key: string; label: string; hint: string; default: boolean }> = [
+  { key: "auto_host", label: "Auto-host", hint: "the console runs the night itself", default: true },
+  { key: "speed_bonus", label: "Speed bonus", hint: "faster correct answers score more", default: true },
+  { key: "team_edits", label: "Team answer edits", hint: "teams can change answers until lock (3 max)", default: false },
+  { key: "tts_enabled", label: "Host voice (TTS)", hint: "plays host lines aloud when audio exists", default: false },
+];
+
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
   const params = await searchParams;
   const error = typeof params.error === "string" ? params.error : null;
+  const notice =
+    params.welcome === "1"
+      ? "Venue created — pick a pack and you're live."
+      : params.saved === "1"
+        ? "Settings saved."
+        : params.requested === "1"
+          ? "Custom pack requested — it lands in your library once it clears QA."
+          : params.feedback === "sent"
+            ? "Feedback sent — thank you."
+            : null;
 
   const supabase = await createClient();
   const {
@@ -17,39 +50,82 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: membership }, { data: packs }] = await Promise.all([
-    supabase.from("venue_members").select("venue_id, venues(name)").limit(1).maybeSingle(),
+  const { data: membership } = await supabase
+    .from("venue_members")
+    .select("venue_id, venues(id, name, metro, slug, settings)")
+    .limit(1)
+    .maybeSingle();
+
+  if (!membership) {
+    return (
+      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 py-12">
+        <header>
+          <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
+            Trivia Bot
+          </p>
+          <h1 className="text-3xl font-bold text-zinc-50">Welcome</h1>
+          <p className="mt-1 text-sm text-zinc-500" data-testid="signed-in-as">
+            Signed in as {user.email}
+          </p>
+        </header>
+        <FirstRunWizard error={error} />
+      </main>
+    );
+  }
+
+  const venue = membership.venues as unknown as {
+    id: string;
+    name: string;
+    metro: string | null;
+    slug: string | null;
+    settings: Record<string, unknown> | null;
+  };
+  const settings = venue.settings ?? {};
+
+  const [{ data: packs }, { data: historyRaw }, { data: requests }] = await Promise.all([
     supabase
       .from("packs")
       .select("id, title, topic, description, question_count, rounds, tags")
       .order("title"),
+    supabase.rpc("venue_history"),
+    supabase
+      .from("custom_pack_requests")
+      .select("id, topic, status, requested_at")
+      .order("requested_at", { ascending: false })
+      .limit(5),
   ]);
-
-  const venueName =
-    (membership?.venues as unknown as { name: string } | null)?.name ?? null;
+  const nights = (historyRaw ?? []) as unknown as Night[];
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-12">
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-6 py-12">
       <header className="flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
             Trivia Bot
           </p>
-          <h1 className="text-3xl font-bold text-zinc-50">
-            {venueName ?? "Venue dashboard"}
+          <h1 className="text-3xl font-bold text-zinc-50" data-testid="venue-name">
+            {venue.name}
           </h1>
           <p className="mt-1 text-sm text-zinc-500" data-testid="signed-in-as">
-            Signed in as {user.email}
+            {venue.metro} · /v/{venue.slug} · {user.email}
           </p>
         </div>
-        <form action="/auth/signout" method="post">
-          <button
-            type="submit"
-            className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-300 hover:border-zinc-500"
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/promo"
+            className="rounded-lg border border-amber-500 px-3 py-1.5 text-sm text-amber-300 hover:bg-amber-950"
           >
-            Sign out
-          </button>
-        </form>
+            Promo kit
+          </Link>
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-300 hover:border-zinc-500"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </header>
 
       {error && (
@@ -57,17 +133,16 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           {error}
         </p>
       )}
-
-      {!membership && (
-        <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-400">
-          Your account isn&apos;t attached to a venue yet. Venue setup (the
-          first-run wizard) arrives with M5 — for now an operator seeds venues.
+      {notice && (
+        <p className="rounded-lg border border-emerald-900 bg-emerald-950 px-4 py-3 text-emerald-300" data-testid="notice">
+          {notice}
         </p>
       )}
 
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold text-zinc-200">
-          Pack library <span className="text-sm font-normal text-zinc-500">— free, QA&apos;d, ready tonight</span>
+          Pack library{" "}
+          <span className="text-sm font-normal text-zinc-500">— free, QA&apos;d, ready tonight</span>
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="pack-library">
           {(packs ?? []).map((pack) => (
@@ -81,9 +156,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 <p className="text-xs uppercase tracking-wider text-zinc-500">
                   {pack.topic} · {pack.rounds} rounds · {pack.question_count} questions
                 </p>
-                {pack.description && (
-                  <p className="text-sm text-zinc-400">{pack.description}</p>
-                )}
+                {pack.description && <p className="text-sm text-zinc-400">{pack.description}</p>}
               </div>
               <form action={startGame.bind(null, pack.id)} className="mt-auto">
                 <button
@@ -95,11 +168,163 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               </form>
             </article>
           ))}
-          {(packs ?? []).length === 0 && (
-            <p className="text-zinc-500">No live packs yet — the library seeds in M2.</p>
-          )}
         </div>
       </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xl font-semibold text-zinc-200">Recent nights</h2>
+        {nights.length === 0 ? (
+          <p className="text-sm text-zinc-500">No nights yet — your history builds here.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm" data-testid="night-history">
+              <thead className="text-xs uppercase tracking-wider text-zinc-500">
+                <tr>
+                  <th className="py-2 pr-4">Date</th>
+                  <th className="py-2 pr-4">Pack</th>
+                  <th className="py-2 pr-4">Players</th>
+                  <th className="py-2 pr-4">Teams</th>
+                  <th className="py-2 pr-4">Winner</th>
+                  <th className="py-2 pr-4">Length</th>
+                  <th className="py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody className="text-zinc-300">
+                {nights.map((n) => (
+                  <tr key={n.game_id} className="border-t border-zinc-800">
+                    <td className="py-2 pr-4">{new Date(n.created_at).toLocaleDateString()}</td>
+                    <td className="py-2 pr-4">{n.pack_title}</td>
+                    <td className="py-2 pr-4">{n.players}</td>
+                    <td className="py-2 pr-4">{n.teams}</td>
+                    <td className="py-2 pr-4">{n.winner ?? "—"}</td>
+                    <td className="py-2 pr-4">
+                      {n.duration_s ? `${Math.round(n.duration_s / 60)}m` : "—"}
+                    </td>
+                    <td className="py-2">
+                      {n.state === "ended" ? (
+                        n.state
+                      ) : n.state === "abandoned" ? (
+                        <span className="text-zinc-600">{n.state}</span>
+                      ) : (
+                        <Link className="text-amber-400 underline" href={`/host/${n.game_id}`}>
+                          {n.state} → console
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold text-zinc-200">Night settings</h2>
+          <form
+            action={updateVenueSettings.bind(null, venue.id)}
+            className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-5"
+            data-testid="settings-form"
+          >
+            {TOGGLES.map((t) => (
+              <label key={t.key} className="flex items-start gap-3 text-sm text-zinc-300">
+                <input
+                  type="checkbox"
+                  name={t.key}
+                  defaultChecked={
+                    typeof settings[t.key] === "boolean" ? (settings[t.key] as boolean) : t.default
+                  }
+                  className="mt-0.5 h-4 w-4 accent-amber-400"
+                />
+                <span>
+                  <span className="font-semibold text-zinc-200">{t.label}</span>
+                  <span className="block text-xs text-zinc-500">{t.hint}</span>
+                </span>
+              </label>
+            ))}
+            <button
+              type="submit"
+              className="mt-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:border-amber-400"
+            >
+              Save defaults
+            </button>
+          </form>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold text-zinc-200">
+            Custom pack{" "}
+            <span className="rounded-full border border-emerald-800 px-2 py-0.5 text-xs text-emerald-400">
+              premium — comped
+            </span>
+          </h2>
+          <form
+            action={requestCustomPack}
+            className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-5"
+            data-testid="custom-pack-form"
+          >
+            <label className="flex flex-col gap-1 text-sm text-zinc-300">
+              Topic
+              <input
+                name="topic"
+                required
+                maxLength={120}
+                placeholder="'90s Detroit sports"
+                className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-50"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-zinc-300">
+              Notes (optional)
+              <textarea
+                name="notes"
+                rows={2}
+                maxLength={500}
+                className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-50"
+              />
+            </label>
+            <button
+              type="submit"
+              className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950"
+            >
+              Request pack
+            </button>
+            {(requests ?? []).length > 0 && (
+              <ul className="mt-1 flex flex-col gap-1 text-xs text-zinc-400" data-testid="request-list">
+                {(requests ?? []).map((r) => (
+                  <li key={r.id}>
+                    “{r.topic}” — <span className="text-amber-300">{r.status}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </form>
+
+          <form
+            action={submitVenueFeedback}
+            className="flex flex-col gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-5"
+            data-testid="venue-feedback-form"
+          >
+            <label className="flex flex-col gap-1 text-sm text-zinc-300">
+              Tell us anything
+              <textarea
+                name="body"
+                required
+                rows={2}
+                maxLength={2000}
+                placeholder="What worked? What flopped?"
+                className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-50"
+              />
+            </label>
+            <button
+              type="submit"
+              className="self-start rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:border-amber-400"
+            >
+              Send feedback
+            </button>
+          </form>
+        </section>
+      </div>
     </main>
   );
 }
