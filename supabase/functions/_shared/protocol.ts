@@ -124,6 +124,7 @@ export function acceptsAnswers(state: GameStateName): boolean {
 export interface GameSettings {
   speed_bonus?: boolean; // default true (PRD §5)
   team_edits?: boolean; // default false: first answer locks
+  auto_host?: boolean; // default true: the console runs the night itself (M3)
   roast_mode?: boolean; // default false (M3)
   tts_enabled?: boolean; // default false (M3)
   sponsor_slot?: boolean; // default false (M6)
