@@ -197,8 +197,11 @@ password_requirements = ""
 # rp_origins = ["http://127.0.0.1:3000"]
 
 [auth.rate_limit]
-# Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+# Number of emails that can be sent per hour. Local/CI only: E2E suites send
+# several magic links per run (login, signup, the save moment) — the default
+# of 2/hour starves them. PROD note: the hosted project's built-in SMTP has a
+# similar cap; real player volume requires custom SMTP (owner to-do).
+email_sent = 360
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
