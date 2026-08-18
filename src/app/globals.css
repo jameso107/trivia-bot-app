@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+/* Deliberately dark-only: this is a bar product — TV consoles and phones in
+ * dim rooms. The scaffold's light/dark variable swap was an unlayered rule
+ * that BEAT Tailwind's layered bg-zinc-950 utility, so light-mode phones got
+ * white-on-white (caught by the M7 axe gate). Fixed colors, no media query. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b; /* zinc-950 */
+  --foreground: #fafafa; /* zinc-50 */
 }
 
 @theme inline {
@@ -10,13 +14,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

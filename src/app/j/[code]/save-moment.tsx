@@ -37,7 +37,7 @@ function FeedbackNudge({ gameId }: { gameId: string }) {
     );
   }
   return (
-    <details className="text-center text-sm text-zinc-500">
+    <details className="text-center text-sm text-zinc-400">
       <summary className="cursor-pointer hover:text-zinc-300">
         Something off tonight? Tell us
       </summary>
@@ -129,15 +129,15 @@ export function SaveMoment({ identity }: { identity: Identity }) {
 
       <dl className="grid grid-cols-3 gap-3 text-center" data-testid="personal-stats">
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
-          <dt className="text-xs uppercase tracking-wider text-zinc-500">You answered</dt>
+          <dt className="text-xs uppercase tracking-wider text-zinc-400">You answered</dt>
           <dd className="text-2xl font-black">{stats.answered}</dd>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
-          <dt className="text-xs uppercase tracking-wider text-zinc-500">Got right</dt>
+          <dt className="text-xs uppercase tracking-wider text-zinc-400">Got right</dt>
           <dd className="text-2xl font-black text-emerald-400">{stats.correct}</dd>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
-          <dt className="text-xs uppercase tracking-wider text-zinc-500">Fastest</dt>
+          <dt className="text-xs uppercase tracking-wider text-zinc-400">Fastest</dt>
           <dd className="text-2xl font-black text-amber-400">
             {stats.fastestSeconds !== null ? `${stats.fastestSeconds}s` : "—"}
           </dd>

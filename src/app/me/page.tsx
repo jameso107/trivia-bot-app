@@ -44,15 +44,15 @@ export default async function MePage() {
 
       <dl className="grid grid-cols-3 gap-3 text-center" data-testid="me-totals">
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-          <dt className="text-xs uppercase tracking-wider text-zinc-500">Nights</dt>
+          <dt className="text-xs uppercase tracking-wider text-zinc-400">Nights</dt>
           <dd className="text-3xl font-black">{stats.totals.games}</dd>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-          <dt className="text-xs uppercase tracking-wider text-zinc-500">Correct</dt>
+          <dt className="text-xs uppercase tracking-wider text-zinc-400">Correct</dt>
           <dd className="text-3xl font-black text-emerald-400">{stats.totals.correct}</dd>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-          <dt className="text-xs uppercase tracking-wider text-zinc-500">Wins</dt>
+          <dt className="text-xs uppercase tracking-wider text-zinc-400">Wins</dt>
           <dd className="text-3xl font-black text-amber-400">{stats.totals.wins}</dd>
         </div>
       </dl>
@@ -67,13 +67,13 @@ export default async function MePage() {
             >
               <div>
                 <p className="font-semibold">{g.packTitle}</p>
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-zinc-400">
                   {new Date(g.playedAt).toLocaleDateString()} · {g.teamName}
                 </p>
               </div>
               <p className="text-right">
                 <span className="text-xl font-black text-amber-400">#{g.rank}</span>
-                <span className="text-sm text-zinc-500"> of {g.teamsTotal}</span>
+                <span className="text-sm text-zinc-400"> of {g.teamsTotal}</span>
               </p>
             </li>
           ))}
