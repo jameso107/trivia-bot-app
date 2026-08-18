@@ -172,6 +172,17 @@ export function Console({
     return () => clearTimeout(id);
   }, [state, autoHost, paused, advance]);
 
+  // Every team is in? Don't make the room stare at a countdown — hold one
+  // beat (the last lock-in deserves its moment) and cut to the lock.
+  useEffect(() => {
+    if (!state || !autoHost || paused || !tick) return;
+    if (state.state !== "question" && state.state !== "final_question") return;
+    if (!state.question || tick.questionId !== state.question.id) return;
+    if (state.teams.length === 0 || tick.answeredTeams < state.teams.length) return;
+    const id = setTimeout(() => void advance(), 1500);
+    return () => clearTimeout(id);
+  }, [state, tick, autoHost, paused, advance]);
+
   // Manual override (PRD §6): space advances, p pauses/resumes the engine.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

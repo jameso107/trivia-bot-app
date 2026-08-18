@@ -68,6 +68,18 @@ test("a venue creates a night from the library and plays it", async ({
     timeout: 20000,
   });
 
+  // All-answered skip: both teams answer Q2 and the console cuts to the lock
+  // on its own — no clicks, long before the 30s deadline.
+  await expect(p1.getByTestId("answer-form")).toBeVisible({ timeout: 15000 });
+  await p1.getByTestId("option-3").click(); // Toto — correct
+  await expect(p1.getByTestId("answer-locked")).toBeVisible({ timeout: 10000 });
+  await expect(p2.getByTestId("answer-form")).toBeVisible({ timeout: 15000 });
+  await p2.getByTestId("option-0").click();
+  await expect(p2.getByTestId("answer-locked")).toBeVisible({ timeout: 10000 });
+  await expect(hostPage.getByTestId("console-state")).toHaveAttribute("data-state", "locked", {
+    timeout: 8000,
+  });
+
   // The creation flow emitted its frozen event.
   const admin = adminClient();
   const { data: created } = await admin
