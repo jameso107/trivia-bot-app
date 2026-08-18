@@ -1,0 +1,645 @@
+{
+  "title": "Bar Classics: Food & Drink",
+  "topic": "food & drink",
+  "description": "Four rounds and a final wager spanning spirits, cellar lore, kitchen science, and famous food moments.",
+  "rounds": 4,
+  "question_count": 41,
+  "difficulty_curve": [
+    2.2,
+    2.8,
+    3.2,
+    3.0
+  ],
+  "tags": [
+    "food",
+    "drink",
+    "library"
+  ],
+  "questions": [
+    {
+      "round": 1,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "A classic margarita is built on which spirit?",
+      "options": [
+        "Vodka",
+        "Rum",
+        "Tequila",
+        "Gin"
+      ],
+      "answer": 2,
+      "answer_note": "source: IBA official cocktail list — the margarita is tequila, triple sec, and lime juice.",
+      "difficulty": 1.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Guinness has been brewed at St. James's Gate in which city since 1759?",
+      "options": [
+        "London",
+        "Dublin",
+        "Edinburgh",
+        "Belfast"
+      ],
+      "answer": 1,
+      "answer_note": "source: Guinness archives — Arthur Guinness leased the St. James's Gate brewery in Dublin in 1759.",
+      "difficulty": 1.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 3,
+      "format": "true_false",
+      "prompt": "Botanically speaking, peanuts are true nuts.",
+      "options": null,
+      "answer": false,
+      "answer_note": "source: Encyclopaedia Britannica — peanuts are legumes in the pea family, not botanical nuts.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "A classic Mojito is built on which spirit?",
+      "options": [
+        "Vodka",
+        "Gin",
+        "White rum",
+        "Tequila"
+      ],
+      "answer": 2,
+      "answer_note": "source: IBA official cocktail list — the Mojito is white rum, lime, mint, sugar, and soda.",
+      "difficulty": 1.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 5,
+      "format": "open_text",
+      "prompt": "Which fresh herb is the base of classic Genoese pesto?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "basil",
+          "sweet basil",
+          "fresh basil"
+        ]
+      },
+      "answer_note": "source: Encyclopaedia Britannica — pesto alla genovese is pounded basil with pine nuts, garlic, cheese, and olive oil.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "The Scoville scale rates what quality in peppers?",
+      "options": [
+        "Sweetness",
+        "Heat",
+        "Color",
+        "Crunch"
+      ],
+      "answer": 1,
+      "answer_note": "source: Encyclopaedia Britannica — Wilbur Scoville's 1912 scale measures chili pepper pungency from capsaicin.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 7,
+      "format": "multiple_choice",
+      "prompt": "Marzipan is a paste of sugar and which ground nut?",
+      "options": [
+        "Almond",
+        "Hazelnut",
+        "Pistachio",
+        "Cashew"
+      ],
+      "answer": 0,
+      "answer_note": "source: Encyclopaedia Britannica — marzipan is a confection of ground almonds and sugar.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "In 'Pulp Fiction,' what do Paris menus call the Quarter Pounder with Cheese?",
+      "options": [
+        "Le Big Mac",
+        "Royale with Cheese",
+        "Big Kahuna Burger",
+        "Le Quarter Fromage"
+      ],
+      "answer": 1,
+      "answer_note": "source: Pulp Fiction (1994) — the metric system renames the Quarter Pounder a Royale with Cheese.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Cognac is a brandy distilled from which fruit?",
+      "options": [
+        "Apples",
+        "Pears",
+        "Grapes",
+        "Plums"
+      ],
+      "answer": 2,
+      "answer_note": "source: Cognac AOC rules — cognac is distilled from white wine grapes, chiefly ugni blanc; apple brandy is calvados.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 1,
+      "position": 10,
+      "format": "number_closest",
+      "prompt": "How many gallons of beer are in a standard full US beer barrel?",
+      "options": null,
+      "answer": 31,
+      "answer_note": "source: US Tax and Trade Bureau — a US beer barrel is defined as 31 gallons; a typical half-barrel keg holds 15.5.",
+      "difficulty": 4.0,
+      "time_limit_s": 35
+    },
+    {
+      "round": 2,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "Sake is brewed mainly from what ingredient?",
+      "options": [
+        "Rice",
+        "Plums",
+        "Wheat",
+        "Honey"
+      ],
+      "answer": 0,
+      "answer_note": "source: Japan Sake and Shochu Makers Association — sake is brewed from polished rice, water, koji, and yeast.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Classic kimchi is most often made from which vegetable?",
+      "options": [
+        "Napa cabbage",
+        "Radish",
+        "Cucumber",
+        "Bean sprouts"
+      ],
+      "answer": 0,
+      "answer_note": "source: Encyclopaedia Britannica — baechu (napa cabbage) kimchi is Korea's most common variety.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 3,
+      "format": "multiple_choice",
+      "prompt": "Which chef brought French cooking to American TV with 'The French Chef' in 1963?",
+      "options": [
+        "James Beard",
+        "Julia Child",
+        "Betty Crocker",
+        "Martha Stewart"
+      ],
+      "answer": 1,
+      "answer_note": "source: PBS/WGBH — Julia Child's 'The French Chef' debuted on Boston public TV in 1963.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "Poutine — fries, gravy, and cheese curds — was born in which Canadian province?",
+      "options": [
+        "Ontario",
+        "British Columbia",
+        "Quebec",
+        "Alberta"
+      ],
+      "answer": 2,
+      "answer_note": "source: Encyclopaedia Britannica — poutine emerged in rural Quebec in the late 1950s.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 5,
+      "format": "true_false",
+      "prompt": "Cheddar cheese is named after a village in England.",
+      "options": null,
+      "answer": true,
+      "answer_note": "source: Oxford Companion to Cheese — cheddar originated around the village of Cheddar in Somerset, England.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "Which of these is NOT one of Escoffier's 5 French mother sauces?",
+      "options": [
+        "Béchamel",
+        "Velouté",
+        "Marinara",
+        "Hollandaise"
+      ],
+      "answer": 2,
+      "answer_note": "source: Escoffier's Guide Culinaire — the 5 mother sauces are béchamel, velouté, espagnole, hollandaise, and tomato.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 7,
+      "format": "number_closest",
+      "prompt": "By law, Scotch whisky must mature in oak casks for at least how many years?",
+      "options": null,
+      "answer": 3,
+      "answer_note": "source: Scotch Whisky Regulations 2009 — minimum maturation is 3 years in oak casks in Scotland.",
+      "difficulty": 3.0,
+      "time_limit_s": 35
+    },
+    {
+      "round": 2,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "Traditional Worcestershire sauce gets its savory depth from which cured fish?",
+      "options": [
+        "Anchovies",
+        "Sardines",
+        "Herring",
+        "Cod"
+      ],
+      "answer": 0,
+      "answer_note": "source: Lea & Perrins ingredients — Worcestershire sauce is fermented with anchovies, vinegar, and spices.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 9,
+      "format": "open_text",
+      "prompt": "Which fortified wine takes its English name from Jerez, the Spanish city where it is made?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "sherry",
+          "jerez",
+          "sherry wine"
+        ]
+      },
+      "answer_note": "source: Consejo Regulador del Jerez — sherry is the anglicized name of Jerez de la Frontera's fortified wine.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 2,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "Angostura bitters, in the famous oversized-label bottle, are made in which Caribbean nation?",
+      "options": [
+        "Cuba",
+        "Jamaica",
+        "Trinidad and Tobago",
+        "Barbados"
+      ],
+      "answer": 2,
+      "answer_note": "source: House of Angostura — the bitters have been produced in Trinidad since 1875.",
+      "difficulty": 4.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "In 'The Godfather,' Clemenza famously says to leave the gun and take which dessert?",
+      "options": [
+        "Tiramisu",
+        "Cannoli",
+        "Biscotti",
+        "Sfogliatelle"
+      ],
+      "answer": 1,
+      "answer_note": "source: The Godfather (1972) — Clemenza's cannoli instruction is one of film's most quoted food lines.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Most rosé wine gets its pink color from brief contact with what?",
+      "options": [
+        "Red grape skins",
+        "Oak barrels",
+        "Cherry juice",
+        "Rose petals"
+      ],
+      "answer": 0,
+      "answer_note": "source: Oxford Companion to Wine — rosé is made by short maceration of juice on red grape skins.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 3,
+      "format": "true_false",
+      "prompt": "Botanically, a strawberry is a true berry.",
+      "options": null,
+      "answer": false,
+      "answer_note": "source: Encyclopaedia Britannica — strawberries are accessory fruits; bananas actually are true berries.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "Arabica coffee is native to the highlands of which country?",
+      "options": [
+        "Brazil",
+        "Colombia",
+        "Ethiopia",
+        "Indonesia"
+      ],
+      "answer": 2,
+      "answer_note": "source: Encyclopaedia Britannica — Coffea arabica is indigenous to the highlands of Ethiopia.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 5,
+      "format": "multiple_choice",
+      "prompt": "Sriracha sauce is named after a seaside town in which country?",
+      "options": [
+        "Vietnam",
+        "Thailand",
+        "China",
+        "Philippines"
+      ],
+      "answer": 1,
+      "answer_note": "source: Encyclopaedia Britannica — sriracha takes its name from Si Racha in Chonburi province, Thailand.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "Searing steak browns it through which reaction between amino acids and sugars?",
+      "options": [
+        "Caramelization",
+        "Fermentation",
+        "Maillard reaction",
+        "Hydrogenation"
+      ],
+      "answer": 2,
+      "answer_note": "source: Harold McGee, On Food and Cooking — Maillard browning requires amino acids plus reducing sugars.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 7,
+      "format": "open_text",
+      "prompt": "A martini garnished with a pickled cocktail onion goes by what name?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "gibson",
+          "a gibson",
+          "the gibson"
+        ]
+      },
+      "answer_note": "source: Oxford Companion to Spirits & Cocktails — a Gibson is a martini garnished with a cocktail onion.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "Traders from which country introduced the frying technique behind tempura to Japan in the 1500s?",
+      "options": [
+        "Portugal",
+        "Spain",
+        "Netherlands",
+        "Britain"
+      ],
+      "answer": 0,
+      "answer_note": "source: Encyclopaedia Britannica — Portuguese traders and missionaries brought the batter-frying technique to Japan in the 16th century.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Which grape variety is the backbone of Chianti?",
+      "options": [
+        "Nebbiolo",
+        "Barbera",
+        "Sangiovese",
+        "Primitivo"
+      ],
+      "answer": 2,
+      "answer_note": "source: Chianti DOCG rules — Chianti must be at least 70% sangiovese.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 3,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "Green Chartreuse liqueur is still made by monks of which religious order?",
+      "options": [
+        "Benedictine",
+        "Trappist",
+        "Franciscan",
+        "Carthusian"
+      ],
+      "answer": 3,
+      "answer_note": "source: Chartreuse distillery — Carthusian monks of the Grande Chartreuse make it from a 1605 manuscript recipe.",
+      "difficulty": 4.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "Pharmacist John Pemberton created Coca-Cola in 1886 in which US city?",
+      "options": [
+        "Atlanta",
+        "Memphis",
+        "New Orleans",
+        "Chattanooga"
+      ],
+      "answer": 0,
+      "answer_note": "source: The Coca-Cola Company — Pemberton first sold the drink at an Atlanta pharmacy in 1886.",
+      "difficulty": 2.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 2,
+      "format": "multiple_choice",
+      "prompt": "Which chef's 2000 memoir 'Kitchen Confidential' spilled professional kitchen secrets?",
+      "options": [
+        "Gordon Ramsay",
+        "Anthony Bourdain",
+        "David Chang",
+        "Wolfgang Puck"
+      ],
+      "answer": 1,
+      "answer_note": "source: Encyclopaedia Britannica — Anthony Bourdain published 'Kitchen Confidential' in 2000.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 3,
+      "format": "open_text",
+      "prompt": "Sweet, sour, salty, bitter — what is the 5th basic taste called?",
+      "options": null,
+      "answer": {
+        "accept": [
+          "umami",
+          "savory",
+          "savoury"
+        ]
+      },
+      "answer_note": "source: Umami Information Center — Kikunae Ikeda identified umami as the 5th basic taste in 1908.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 4,
+      "format": "multiple_choice",
+      "prompt": "White chocolate contains cocoa butter but lacks which component of regular chocolate?",
+      "options": [
+        "Cocoa solids",
+        "Sugar",
+        "Milk solids",
+        "Lecithin"
+      ],
+      "answer": 0,
+      "answer_note": "source: FDA standard of identity — white chocolate is cocoa butter, milk, and sugar with no nonfat cocoa solids.",
+      "difficulty": 2.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 5,
+      "format": "true_false",
+      "prompt": "Hawaiian pizza was invented in Canada.",
+      "options": null,
+      "answer": true,
+      "answer_note": "source: BBC obituary of Sam Panopoulos — he first put pineapple on pizza in Chatham, Ontario, in 1962.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 6,
+      "format": "multiple_choice",
+      "prompt": "Kiwifruit was rebranded and exported by New Zealand, but the plant is native to which country?",
+      "options": [
+        "Australia",
+        "China",
+        "Chile",
+        "South Africa"
+      ],
+      "answer": 1,
+      "answer_note": "source: Encyclopaedia Britannica — the kiwifruit vine is native to China and was long called the Chinese gooseberry.",
+      "difficulty": 3.0,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 7,
+      "format": "number_closest",
+      "prompt": "Prohibition ended in the United States in what year?",
+      "options": null,
+      "answer": 1933,
+      "answer_note": "source: US Constitution, 21st Amendment — ratified December 5, 1933, repealing Prohibition.",
+      "difficulty": 3.0,
+      "time_limit_s": 35
+    },
+    {
+      "round": 4,
+      "position": 8,
+      "format": "multiple_choice",
+      "prompt": "German chocolate cake is named after what?",
+      "options": [
+        "A chocolate maker's surname",
+        "The country Germany",
+        "A Berlin bakery",
+        "A type of dark cocoa"
+      ],
+      "answer": 0,
+      "answer_note": "source: Baker's Chocolate history — Samuel German created the namesake sweet baking chocolate in 1852.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 9,
+      "format": "multiple_choice",
+      "prompt": "Cappuccino takes its name from the hooded robes of which order of friars?",
+      "options": [
+        "Franciscan",
+        "Dominican",
+        "Capuchin",
+        "Jesuit"
+      ],
+      "answer": 2,
+      "answer_note": "source: Oxford English Dictionary — cappuccino refers to the brown hooded robes of Capuchin friars.",
+      "difficulty": 3.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 4,
+      "position": 10,
+      "format": "multiple_choice",
+      "prompt": "Bond's Vesper martini in 'Casino Royale' calls for gin, vodka, and which French aperitif?",
+      "options": [
+        "Lillet",
+        "Dubonnet",
+        "Cointreau",
+        "Pastis"
+      ],
+      "answer": 0,
+      "answer_note": "source: Ian Fleming's Casino Royale (1953) — the Vesper mixes gin, vodka, and Kina Lillet.",
+      "difficulty": 4.5,
+      "time_limit_s": 30
+    },
+    {
+      "round": 5,
+      "position": 1,
+      "format": "multiple_choice",
+      "prompt": "Caesar salad was created in 1924 at Caesar Cardini's restaurant in which country?",
+      "options": [
+        "Italy",
+        "United States",
+        "Mexico",
+        "France"
+      ],
+      "answer": 2,
+      "answer_note": "source: Encyclopaedia Britannica — restaurateur Caesar Cardini created the salad in Tijuana, Mexico, in 1924.",
+      "difficulty": 4.0,
+      "time_limit_s": 45
+    }
+  ]
+}
