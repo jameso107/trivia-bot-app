@@ -48,7 +48,11 @@ racing advances), axe a11y gate (caught+fixed light-mode white-on-white; app
 is deliberately dark-only now), 300-player join cap.
 
 Remaining to call the §9 Definition of Done fully closed:
-- Org daemon dry-run against the events row + contract (needs trivia-bot-org).
+- ~~Org daemon dry-run~~ ✅ CLOSED 2026-08-20: trivia-bot-org built (Phase-A
+  daemon, 8 roles, budgets, dry-run mode); first dry-run against production
+  passed — CX consumed a real venue_signup event end-to-end, CEO computed
+  KPIs from live analytics + briefed the owner, QA worked its queues.
+  See github.com/jameso107/trivia-bot-org.
 - Owner to-dos: Sentry DSN + NEXT_PUBLIC_SITE_URL in Vercel, Supabase Pro
   (free projects pause when idle — fatal for a bar night), custom SMTP before
   real player volume, product domain.
