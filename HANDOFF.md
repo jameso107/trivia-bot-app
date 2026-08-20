@@ -72,7 +72,11 @@ trivia-bot-org has a Dockerfile (Railway auto-detects), fetches doctrine at
 boot via scripts/fetch-brain.mjs (GITHUB_TOKEN, read-only), heartbeats
 org_flags.daemon_heartbeat every minute (console shows LIVE/OFFLINE). Verified
 in a local container. ONE daemon at a time. Until Railway is up: `npm run
-daemon` on the Mac.
+daemon` on the Mac. Integrations (2026-08-20): Firecrawl web tools
+(search/scrape, 4 web-facing roles) + AgentMail mail loop (D-010,
+syzygy@agentmail.to — owner-only transmit in live mode, inbound polled 5m
+into events kind=email_received, venue-success works the queue; outreach
+still locked until a dedicated domain). Both verified against live services.
 
 ## Owner to-dos (off-tool)
 
