@@ -58,6 +58,17 @@ Remaining to call the §9 Definition of Done fully closed:
   real player volume, product domain.
 - M3's dwell timings and host-line copy iterate on real-night feedback.
 
+## The org (as of 2026-08-20)
+
+trivia-bot-org: ALL 28 registry roles runnable (OpenAI Responses agents,
+per-role tool allowlists, code-enforced budgets/QA bars/outreach triple-lock).
+Scheduler activates by ORG_PHASE env (A=8 agents default, B=+11, C=+7).
+§9 dry-run PASSED vs prod. Org console at trivia-bot-org/web (own Vercel
+project, rootDirectory=web, passcode-gated, service key server-side):
+overview/agents/approvals/tasks/runs/outbox/incidents/money/funnel/company/
+controls. Control plane = org_flags + agent_run_requests + outbox_records
+(D-008); kill switch verified end-to-end. Daemon host runs `npm run daemon`.
+
 ## Owner to-dos (off-tool)
 
 Vercel env: `NEXT_PUBLIC_SITE_URL`, Sentry DSN pair. Supabase Pro upgrade
