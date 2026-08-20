@@ -67,7 +67,12 @@ Scheduler activates by ORG_PHASE env (A=8 agents default, B=+11, C=+7).
 project, rootDirectory=web, passcode-gated, service key server-side):
 overview/agents/approvals/tasks/runs/outbox/incidents/money/funnel/company/
 controls. Control plane = org_flags + agent_run_requests + outbox_records
-(D-008); kill switch verified end-to-end. Daemon host runs `npm run daemon`.
+(D-008); kill switch verified end-to-end. Daemon hosting: Railway (D-009) —
+trivia-bot-org has a Dockerfile (Railway auto-detects), fetches doctrine at
+boot via scripts/fetch-brain.mjs (GITHUB_TOKEN, read-only), heartbeats
+org_flags.daemon_heartbeat every minute (console shows LIVE/OFFLINE). Verified
+in a local container. ONE daemon at a time. Until Railway is up: `npm run
+daemon` on the Mac.
 
 ## Owner to-dos (off-tool)
 
