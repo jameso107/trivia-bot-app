@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { PrintButton } from "./print-button";
 
-export const metadata = { title: "Promo kit — Trivia Bot" };
+export const metadata = { title: "Promo kit — TRIVIUM" };
 
 // The promo kit (PRD §7): a printable flyer + copy-paste social captions.
 // Plain HTML with a print stylesheet — no PDF service by decision. The QR

@@ -52,7 +52,7 @@ test("ad slots: sponsor screen creative, house phone card, impressions, venue he
     { timeout: 15000 },
   );
   // Phone: the house card between rounds.
-  await expect(p1.getByTestId("phone-ad")).toContainText("Bring Trivia Bot to your bar", {
+  await expect(p1.getByTestId("phone-ad")).toContainText("Bring TRIVIUM to your bar", {
     timeout: 15000,
   });
 

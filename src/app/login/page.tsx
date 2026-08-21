@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { sendMagicLink } from "./actions";
 
-export const metadata = { title: "Sign in — Trivia Bot" };
+export const metadata = { title: "Sign in — TRIVIUM" };
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;
@@ -11,7 +11,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-16">
       <Link href="/" className="text-sm font-semibold uppercase tracking-widest text-amber-400">
-        Trivia Bot
+        TRIVIUM
       </Link>
 
       <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-900 p-8">

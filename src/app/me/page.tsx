@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FnError, meStats } from "@/lib/game/api";
 
-export const metadata = { title: "My nights — Trivia Bot" };
+export const metadata = { title: "My nights — TRIVIUM" };
 
 // Minimal /me (PRD §10 M4): the account has to be WORTH creating — your
 // nights, your numbers. Streaks and leagues are post-MVP by decision.
@@ -35,7 +35,7 @@ export default async function MePage() {
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-5 py-12">
       <header>
         <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
-          Trivia Bot
+          TRIVIUM
         </p>
         <h1 className="text-3xl font-bold" data-testid="me-name">
           {stats.profile.display_name}

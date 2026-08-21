@@ -225,7 +225,7 @@ export function Console({
 
       <header className="flex items-center justify-between text-2xl text-zinc-400">
         <span className="font-semibold uppercase tracking-widest text-amber-400">
-          {state.packTitle || "Trivia Bot"}
+          {state.packTitle || "TRIVIUM"}
         </span>
         <span className="flex items-center gap-6">
           <span

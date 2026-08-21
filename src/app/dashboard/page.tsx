@@ -9,7 +9,7 @@ import {
 } from "./actions";
 import { FirstRunWizard } from "./wizard";
 
-export const metadata = { title: "Dashboard — Trivia Bot" };
+export const metadata = { title: "Dashboard — TRIVIUM" };
 
 interface Night {
   game_id: string;
@@ -61,7 +61,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 py-12">
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
-            Trivia Bot
+            TRIVIUM
           </p>
           <h1 className="text-3xl font-bold text-zinc-50">Welcome</h1>
           <p className="mt-1 text-sm text-zinc-400" data-testid="signed-in-as">
@@ -101,7 +101,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       <header className="flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
-            Trivia Bot
+            TRIVIUM
           </p>
           <h1 className="text-3xl font-bold text-zinc-50" data-testid="venue-name">
             {venue.name}

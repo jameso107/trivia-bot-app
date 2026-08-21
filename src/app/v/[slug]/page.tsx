@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Join the game — Trivia Bot" };
+export const metadata = { title: "Join the game — TRIVIUM" };
 
 // The flyer QR's permanent target: forwards to the venue's current game, or
 // tells you when to come back. Public — no auth, no membership.
@@ -16,7 +16,7 @@ export default async function VenueJoinPage({ params }: PageProps<"/v/[slug]">) 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center gap-4 px-5 text-center">
       <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
-        Trivia Bot
+        TRIVIUM
       </p>
       <h1 className="text-3xl font-black" data-testid="no-game">
         {info?.venue_name ? `No live game at ${info.venue_name} right now` : "Venue not found"}

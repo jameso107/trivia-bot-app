@@ -8,7 +8,7 @@ export default function Home() {
           Free · no host · ten-minute setup
         </p>
         <h1 className="max-w-3xl text-5xl font-black tracking-tight text-zinc-50 sm:text-7xl">
-          Trivia Bot
+          TRIVIUM
         </h1>
         <p className="max-w-xl text-lg leading-8 text-zinc-400">
           A full trivia night from any computer plugged into a TV. Players join
