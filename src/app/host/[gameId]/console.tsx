@@ -163,6 +163,42 @@ export function Console({
     }
   }, [gameId, state]);
 
+  // "Finish game & exit": two presses (arm, then commit within 4s) — ends the
+  // night as it stands by jumping to the podium; ended flows from there.
+  const [confirmFinish, setConfirmFinish] = useState(false);
+  useEffect(() => {
+    if (!confirmFinish) return;
+    const id = setTimeout(() => setConfirmFinish(false), 4000);
+    return () => clearTimeout(id);
+  }, [confirmFinish]);
+  const finishGame = useCallback(async () => {
+    if (!state || advancing.current) return;
+    advancing.current = true;
+    try {
+      const supabase = createClient();
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) return;
+      const res = await advanceGame({
+        gameId,
+        expectedState: state.state,
+        accessToken: token,
+        action: "finish",
+      });
+      setState(res.state);
+      setError(null);
+    } catch (err) {
+      if (!(err instanceof FnError && err.status === 409)) {
+        setError(err instanceof Error ? err.message : "finish failed");
+      }
+      const fresh = await getGameState({ gameId }).catch(() => null);
+      if (fresh) setState(fresh);
+    } finally {
+      advancing.current = false;
+      setConfirmFinish(false);
+    }
+  }, [gameId, state]);
+
   // Sponsor slot (PRD §7): a screen creative in intermission + a strap on
   // round intros, only when the venue opted in via settings.sponsor_slot.
   const sponsorSlot = state?.settings.sponsor_slot === true;
@@ -419,16 +455,40 @@ export function Console({
         <span className="text-xl">
           Join: {joinUrl} · code {state.joinCode}
         </span>
-        {state.state !== "ended" && state.state !== "abandoned" && (
-          <button
-            type="button"
-            data-testid="advance-button"
-            onClick={() => void advance()}
-            className="rounded-xl border border-zinc-700 px-6 py-3 text-2xl text-zinc-300 hover:border-amber-400"
-          >
-            {ADVANCE_LABEL[state.state] ?? "Advance"} <kbd className="ml-2 text-zinc-400">space</kbd>
-          </button>
-        )}
+        <span className="flex items-center gap-3">
+          {!["lobby", "podium", "ended", "abandoned"].includes(state.state) && (
+            <button
+              type="button"
+              data-testid="finish-game-button"
+              onClick={() => (confirmFinish ? void finishGame() : setConfirmFinish(true))}
+              className={
+                confirmFinish
+                  ? "rounded-xl border border-red-700 bg-red-950 px-5 py-3 text-xl font-semibold text-red-300"
+                  : "rounded-xl border border-zinc-800 px-5 py-3 text-xl text-zinc-500 hover:border-red-800 hover:text-red-400"
+              }
+            >
+              {confirmFinish ? "Press again to finish" : "Finish game & exit"}
+            </button>
+          )}
+          {state.state === "ended" && (
+            <a
+              href="/dashboard"
+              className="rounded-xl border border-zinc-700 px-6 py-3 text-2xl text-zinc-300 hover:border-amber-400"
+            >
+              Back to dashboard
+            </a>
+          )}
+          {state.state !== "ended" && state.state !== "abandoned" && (
+            <button
+              type="button"
+              data-testid="advance-button"
+              onClick={() => void advance()}
+              className="rounded-xl border border-zinc-700 px-6 py-3 text-2xl text-zinc-300 hover:border-amber-400"
+            >
+              {ADVANCE_LABEL[state.state] ?? "Advance"} <kbd className="ml-2 text-zinc-400">space</kbd>
+            </button>
+          )}
+        </span>
       </footer>
     </main>
   );

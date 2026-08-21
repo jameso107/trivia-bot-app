@@ -97,6 +97,14 @@ export async function submitVenueFeedback(formData: FormData) {
   );
 }
 
+export async function retireVenuePack(packId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("retire_venue_pack", { p_pack_id: packId });
+  redirect(
+    error ? `/dashboard?error=${encodeURIComponent(error.message)}` : "/dashboard?retired=1",
+  );
+}
+
 export async function logPromoDownload() {
   const supabase = await createClient();
   await supabase.rpc("log_promo_kit_download");

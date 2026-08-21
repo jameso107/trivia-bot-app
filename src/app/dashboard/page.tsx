@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   requestCustomPack,
+  retireVenuePack,
   startGame,
   submitVenueFeedback,
   updateVenueSettings,
@@ -42,7 +43,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           ? "Custom pack requested — it lands in your library once it clears QA."
           : params.feedback === "sent"
             ? "Feedback sent — thank you."
-            : null;
+            : params.published === "1"
+              ? "Your pack is live — it's in your library below, ready to start tonight."
+              : params.retired === "1"
+                ? "Pack retired — past nights keep their history."
+                : null;
 
   const supabase = await createClient();
   const {
@@ -85,7 +90,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const [{ data: packs }, { data: historyRaw }, { data: requests }] = await Promise.all([
     supabase
       .from("packs")
-      .select("id, title, topic, description, question_count, rounds, tags")
+      .select("id, title, topic, description, question_count, rounds, tags, venue_id, status")
       .order("title"),
     supabase.rpc("venue_history"),
     supabase
@@ -141,11 +146,91 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
 
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold text-zinc-200">
-          Pack library{" "}
+          Your packs{" "}
+          <span className="text-sm font-normal text-zinc-400">
+            — written by you, visible only to your venue
+          </span>
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="own-packs">
+          {(packs ?? [])
+            .filter((p) => p.venue_id !== null)
+            .filter((p) => p.status !== "retired")
+            .map((pack) => (
+              <article
+                key={pack.id}
+                data-testid="own-pack-card"
+                className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-5"
+              >
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-lg font-bold text-zinc-50">{pack.title}</h3>
+                    <span
+                      className={`rounded-full border px-2 py-0.5 text-xs ${
+                        pack.status === "live"
+                          ? "border-emerald-800 text-emerald-400"
+                          : "border-amber-800 text-amber-300"
+                      }`}
+                    >
+                      {pack.status}
+                    </span>
+                  </div>
+                  <p className="text-xs uppercase tracking-wider text-zinc-400">
+                    {pack.topic} · {pack.question_count} questions
+                  </p>
+                </div>
+                {pack.status === "live" ? (
+                  <div className="mt-auto flex gap-2">
+                    <form action={startGame.bind(null, pack.id)} className="flex-1">
+                      <button
+                        type="submit"
+                        className="w-full rounded-xl bg-amber-400 px-4 py-2.5 font-semibold text-zinc-950 hover:bg-amber-300"
+                      >
+                        Start tonight&apos;s game
+                      </button>
+                    </form>
+                    <form action={retireVenuePack.bind(null, pack.id)}>
+                      <button
+                        type="submit"
+                        className="rounded-xl border border-zinc-700 px-3 py-2.5 text-sm text-zinc-400 hover:border-red-800 hover:text-red-400"
+                        title="Retire this pack"
+                      >
+                        Retire
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <Link
+                    href={`/dashboard/create?pack=${pack.id}`}
+                    className="mt-auto rounded-xl border border-zinc-600 px-4 py-2.5 text-center font-semibold text-zinc-200 hover:border-amber-400"
+                  >
+                    Keep editing
+                  </Link>
+                )}
+              </article>
+            ))}
+          <Link
+            href="/dashboard/create"
+            data-testid="create-pack-cta"
+            className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-zinc-700 p-5 text-center hover:border-amber-400"
+          >
+            <span className="text-3xl text-amber-400">+</span>
+            <span className="font-semibold text-zinc-200">Create your own pack</span>
+            <span className="text-xs text-zinc-400">
+              your bar, your inside jokes — five questions minimum
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xl font-semibold text-zinc-200">
+          TRIVIUM library{" "}
           <span className="text-sm font-normal text-zinc-400">— free, QA&apos;d, ready tonight</span>
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="pack-library">
-          {(packs ?? []).map((pack) => (
+          {(packs ?? [])
+            .filter((p) => p.venue_id === null)
+            .map((pack) => (
             <article
               key={pack.id}
               data-testid="pack-card"

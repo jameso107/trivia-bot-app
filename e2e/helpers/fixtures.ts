@@ -77,6 +77,9 @@ export async function seedSyntheticNight(): Promise<SyntheticNight> {
       status: "live",
       created_by: "seed",
       difficulty_curve: [2.2, 2.8],
+      // The publish guard (20260821141525) blocks any UPDATE to live without
+      // a qa_report — specs that flip fixture packs live again need this.
+      qa_report: { mean_confidence: 0.99, flags: [], method: "e2e fixture" },
     })
     .select("id")
     .single();

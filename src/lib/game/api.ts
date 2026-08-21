@@ -84,10 +84,15 @@ export function advanceGame(params: {
   gameId: string;
   expectedState: string;
   accessToken: string;
+  action?: "finish"; // jump to podium as-is (host's "finish game & exit")
 }): Promise<{ ok: boolean; state: StatePayload }> {
   return callFn("advance-game", {
     method: "POST",
-    body: { gameId: params.gameId, expectedState: params.expectedState },
+    body: {
+      gameId: params.gameId,
+      expectedState: params.expectedState,
+      ...(params.action ? { action: params.action } : {}),
+    },
     accessToken: params.accessToken,
   });
 }

@@ -45,13 +45,16 @@ async function handle(req: Request): Promise<Response> {
   const user = await userFromRequest(req);
   if (!user) return jsonError("sign in required", 401);
 
-  let body: { gameId?: string; expectedState?: string };
+  let body: { gameId?: string; expectedState?: string; action?: string };
   try {
     body = await req.json();
   } catch {
     return jsonError("invalid JSON", 400);
   }
   if (!body.gameId || !body.expectedState) return jsonError("missing fields", 400);
+  if (body.action !== undefined && body.action !== "finish") {
+    return jsonError("unknown action", 400);
+  }
 
   const db = serviceClient();
   const game = await loadGame(db, body.gameId);
@@ -76,6 +79,32 @@ async function handle(req: Request): Promise<Response> {
     round: game.current_round,
     position: game.current_position,
   };
+
+  // "Finish game & exit": jump straight to the podium with scores AS THEY
+  // STAND (an open question's answers simply don't count). Everything after
+  // is the stock podium → ended path, so game_completed still fires with real
+  // duration/teams and the frozen taxonomy is untouched.
+  if (body.action === "finish") {
+    const finishable: GameStateName[] = [
+      "round_intro", "question", "locked", "reveal", "scores", "intermission", "final_question",
+    ];
+    if (!finishable.includes(cur.state)) {
+      return jsonError("nothing to finish from here", 422);
+    }
+    const { data: finished } = await db
+      .from("games")
+      .update({ state: "podium", question_deadline: null })
+      .eq("id", game.id)
+      .eq("state", cur.state)
+      .eq("current_round", cur.round)
+      .eq("current_position", cur.position)
+      .select("*")
+      .maybeSingle();
+    if (!finished) return jsonError("state moved", 409);
+    const projection = await broadcastState(db, finished as never, shapeInfo);
+    return json({ ok: true, state: projection, enteringQuestionId: null });
+  }
+
   const next = nextStep(cur, shape);
   if (!next) return jsonError("no legal transition from here", 422);
 
