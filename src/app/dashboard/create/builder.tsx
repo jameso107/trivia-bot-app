@@ -215,7 +215,7 @@ export function PackBuilder({ packId }: { packId: string | null }) {
                     type="button"
                     onClick={() => setQuestions((qs) => qs.filter((_, j) => j !== i))}
                     disabled={questions.length === 1}
-                    className="text-zinc-500 hover:text-red-400 disabled:opacity-30"
+                    className="text-zinc-400 hover:text-red-400 disabled:opacity-30"
                     aria-label={`remove question ${i + 1}`}
                   >
                     remove
@@ -259,7 +259,7 @@ export function PackBuilder({ packId }: { packId: string | null }) {
                       />
                     </label>
                   ))}
-                  <p className="text-xs text-zinc-500 sm:col-span-2">the dot marks the right answer</p>
+                  <p className="text-xs text-zinc-400 sm:col-span-2">the dot marks the right answer</p>
                 </div>
               ) : (
                 <div className="flex gap-2">
@@ -277,7 +277,7 @@ export function PackBuilder({ packId }: { packId: string | null }) {
                       {v ? "True" : "False"} {q.answerBool === v ? "✓" : ""}
                     </button>
                   ))}
-                  <span className="self-center text-xs text-zinc-500">tap the correct one</span>
+                  <span className="self-center text-xs text-zinc-400">tap the correct one</span>
                 </div>
               )}
             </li>
@@ -330,7 +330,7 @@ export function PackBuilder({ packId }: { packId: string | null }) {
         >
           Publish to my library
         </button>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-zinc-400">
           {questions.length < 5
             ? `${5 - questions.length} more question${5 - questions.length === 1 ? "" : "s"} to publish`
             : savedAt

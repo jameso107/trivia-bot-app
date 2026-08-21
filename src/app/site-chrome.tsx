@@ -35,7 +35,7 @@ export function SiteFooter() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-lg font-black tracking-tight text-zinc-50">TRIVIUM</p>
-          <p className="mt-1 max-w-xs text-sm text-zinc-500">
+          <p className="mt-1 max-w-xs text-sm text-zinc-400">
             Bar trivia that runs itself. Built in Detroit, played anywhere with a TV.
           </p>
         </div>
@@ -60,7 +60,7 @@ export function SiteFooter() {
           </a>
         </div>
       </div>
-      <p className="pb-8 text-center text-xs text-zinc-500">
+      <p className="pb-8 text-center text-xs text-zinc-400">
         © {new Date().getFullYear()} TRIVIUM · Syzygy Services
       </p>
     </footer>

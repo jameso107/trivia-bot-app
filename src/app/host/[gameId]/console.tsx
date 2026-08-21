@@ -464,7 +464,7 @@ export function Console({
               className={
                 confirmFinish
                   ? "rounded-xl border border-red-700 bg-red-950 px-5 py-3 text-xl font-semibold text-red-300"
-                  : "rounded-xl border border-zinc-800 px-5 py-3 text-xl text-zinc-500 hover:border-red-800 hover:text-red-400"
+                  : "rounded-xl border border-zinc-800 px-5 py-3 text-xl text-zinc-400 hover:border-red-800 hover:text-red-400"
               }
             >
               {confirmFinish ? "Press again to finish" : "Finish game & exit"}

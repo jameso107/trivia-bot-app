@@ -52,7 +52,7 @@ export default function TermsPage() {
       <SiteNav />
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
         <h1 className="text-4xl font-black tracking-[-0.02em] text-zinc-50">Venue terms</h1>
-        <p className="mt-2 text-sm text-zinc-500">Effective 2026-08-21</p>
+        <p className="mt-2 text-sm text-zinc-400">Effective 2026-08-21</p>
         {SECTIONS.map((s) => (
           <section key={s.h} className="mt-10">
             <h2 className="text-xl font-bold text-zinc-100">{s.h}</h2>

@@ -116,7 +116,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               >
                 Run trivia at your bar
               </Link>
-              <span className="text-sm text-zinc-500">
+              <span className="text-sm text-zinc-400">
                 Ten minutes from signup to your first live game.
               </span>
             </div>
@@ -126,7 +126,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           <div className="relative mx-auto w-full max-w-lg" aria-hidden="true">
             <div className="hero-float rounded-2xl border border-zinc-700 bg-zinc-900 p-3 shadow-2xl shadow-black/50">
               <div className="rounded-lg bg-zinc-950 p-6">
-                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-zinc-500">
+                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-zinc-400">
                   <span>Round 2 · Question 4</span>
                   <span className="text-amber-400">00:12</span>
                 </div>
@@ -145,7 +145,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                     </li>
                   ))}
                 </ol>
-                <div className="mt-5 flex items-center justify-between text-xs text-zinc-500">
+                <div className="mt-5 flex items-center justify-between text-xs text-zinc-400">
                   <span>7 of 9 teams answered</span>
                   <span>Join: trivium.games · code TAPS</span>
                 </div>
@@ -153,7 +153,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             </div>
             <div className="absolute -bottom-8 -right-2 w-36 rotate-3 rounded-2xl border border-zinc-700 bg-zinc-900 p-2 shadow-xl shadow-black/60 sm:-right-6">
               <div className="rounded-xl bg-zinc-950 p-3">
-                <p className="text-[10px] uppercase tracking-wider text-zinc-500">Team Sharkbait</p>
+                <p className="text-[10px] uppercase tracking-wider text-zinc-400">Team Sharkbait</p>
                 <p className="mt-1 text-xs font-semibold text-zinc-200">Your answer is in 🔒</p>
                 <div className="mt-2 h-1.5 w-full rounded bg-zinc-800">
                   <div className="h-1.5 w-2/3 rounded bg-amber-400" />
@@ -236,7 +236,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 </Link>
               </div>
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">
-                <p className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+                <p className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
                   Premium (soon)
                 </p>
                 <p className="mt-2 text-4xl font-black text-zinc-300">Bespoke</p>
@@ -261,7 +261,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 <details key={f.q} className="group py-4">
                   <summary className="flex cursor-pointer list-none items-center justify-between text-lg font-semibold text-zinc-100 [&::-webkit-details-marker]:hidden">
                     {f.q}
-                    <span className="ml-4 text-zinc-500 transition-transform group-open:rotate-45">
+                    <span className="ml-4 text-zinc-400 transition-transform group-open:rotate-45">
                       +
                     </span>
                   </summary>
