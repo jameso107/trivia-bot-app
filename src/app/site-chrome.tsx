@@ -7,6 +7,11 @@ import { displayFont } from "./fonts";
 export function SiteNav() {
   return (
     <nav className={`sticky top-0 z-50 border-b border-white/5 bg-zinc-950/70 backdrop-blur-xl ${displayFont.variable}`}>
+      {/* Scroll reveals are progressive enhancement: without JS the content
+          must simply be there — never a page of invisible sections. */}
+      <noscript>
+        <style>{`.reveal{opacity:1 !important;transform:none !important}.enter-up{animation:none !important;opacity:1 !important;filter:none !important}`}</style>
+      </noscript>
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3.5">
         <Link href="/" className="font-display text-lg font-extrabold tracking-tight text-zinc-50 transition-transform duration-300 hover:scale-[1.04]">
           TRIVIUM
