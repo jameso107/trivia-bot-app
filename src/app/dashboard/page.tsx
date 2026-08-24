@@ -29,6 +29,7 @@ const TOGGLES: Array<{ key: string; label: string; hint: string; default: boolea
   { key: "speed_bonus", label: "Speed bonus", hint: "faster correct answers score more", default: true },
   { key: "team_edits", label: "Team answer edits", hint: "teams can change answers until lock (3 max)", default: false },
   { key: "tts_enabled", label: "Host voice (TTS)", hint: "plays host lines aloud when audio exists", default: false },
+  { key: "music_enabled", label: "Music", hint: "synthesized soundtrack from the TV — lobby groove, question tension, podium fanfare ('m' mutes live)", default: false },
 ];
 
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
