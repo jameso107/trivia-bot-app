@@ -22,7 +22,7 @@ test("ad slots: sponsor screen creative, house phone card, impressions, venue he
   // ad-sales). venue_promo is venue-scoped, which also isolates test runs.
   await admin
     .from("games")
-    .update({ settings: { speed_bonus: true, auto_host: false, sponsor_slot: true } })
+    .update({ settings: { speed_bonus: true, auto_host: false, sponsor_slot: true, read_seconds: 0 } })
     .eq("id", night.gameId);
   const { data: sponsorCreative } = await admin
     .from("ad_creatives")

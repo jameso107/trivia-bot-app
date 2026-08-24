@@ -15,6 +15,7 @@ import { useGameChannel } from "@/lib/game/use-game-channel";
 import { createClient } from "@/lib/supabase/client";
 import { useCreative, useImpression } from "@/lib/game/use-creative";
 import { FALSE_STYLE, optionStyle, TRUE_STYLE } from "@/lib/game/palette";
+import { usePreroll } from "@/lib/game/use-preroll";
 import { SaveMoment } from "./save-moment";
 import type {
   LobbyEvent,
@@ -208,6 +209,13 @@ export function PlayerGame({ code }: { code: string }) {
     return state.leaderboard.find((t) => t.teamId === identity.teamId) ?? null;
   }, [state, identity]);
 
+  // Read-in buffer: answers open at deadline − time_limit (server-armed).
+  const preroll = usePreroll(
+    state?.deadlineTs ?? null,
+    state?.serverNowTs ?? null,
+    state?.question?.timeLimitS ?? null,
+  );
+
   if (phase === "boot" || phase === "joining") {
     return (
       <Shell>
@@ -346,7 +354,19 @@ export function PlayerGame({ code }: { code: string }) {
           </div>
         )}
 
-        {isOpen && q && !activeLock && (
+        {isOpen && q && !activeLock && preroll > 0 && (
+          <div className="flex flex-col gap-3 text-center" data-testid="player-preroll">
+            <h1 className="text-xl font-bold leading-snug">{q.prompt}</h1>
+            <p className="text-sm uppercase tracking-widest text-zinc-400">
+              read it — answers open in
+            </p>
+            <p key={preroll} className="animate-pop-in text-6xl font-black text-amber-400">
+              {preroll}
+            </p>
+          </div>
+        )}
+
+        {isOpen && q && !activeLock && preroll === 0 && (
           <AnswerForm key={q.id} question={q} onSubmit={(payload) => void sendAnswer(payload)} />
         )}
 
@@ -569,16 +589,30 @@ function PhoneConfetti() {
   const colors = ["#e11d48", "#0ea5e9", "#fbbf24", "#10b981"];
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-      {Array.from({ length: 14 }, (_, i) => (
+      {Array.from({ length: 16 }, (_, i) => (
         <span
           key={i}
-          className="animate-confetti absolute top-0 block h-2.5 w-1.5 rounded-sm"
-          style={{
-            left: `${(i * 41) % 100}%`,
-            backgroundColor: colors[i % colors.length],
-            animationDelay: `${(i % 7) * 0.4}s`,
-          }}
-        />
+          className="animate-confetti absolute top-0"
+          style={
+            {
+              left: `${(i * 41 + 5) % 100}%`,
+              animationDelay: `${((i * 11) % 26) / 10}s`,
+              animationDuration: `${3 + (i % 4) * 0.4}s`,
+              "--drift": `${((i % 5) - 2) * 22}px`,
+            } as React.CSSProperties
+          }
+        >
+          <span
+            className="animate-flutter rounded-[2px]"
+            style={{
+              width: `${4 + (i % 3) * 2}px`,
+              height: `${7 + (i % 4) * 2}px`,
+              backgroundColor: colors[i % colors.length],
+              animationDelay: `${(i % 5) * 0.15}s`,
+              animationDuration: `${0.9 + (i % 3) * 0.25}s`,
+            }}
+          />
+        </span>
       ))}
     </div>
   );

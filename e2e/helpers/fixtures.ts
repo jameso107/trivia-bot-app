@@ -158,7 +158,7 @@ export async function seedSyntheticNight(): Promise<SyntheticNight> {
       join_code: joinCode,
       state: "lobby",
       // auto_host off: these fixtures are driven manually by the specs.
-      settings: { speed_bonus: true, auto_host: false },
+      settings: { speed_bonus: true, auto_host: false, read_seconds: 0 },
     })
     .select("id")
     .single();
