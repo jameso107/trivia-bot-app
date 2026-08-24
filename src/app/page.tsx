@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "./site-chrome";
 import { displayFont } from "./fonts";
+import { ActionButton } from "./action-button";
 import { Reveal } from "./reveal";
 import { submitInquiry } from "./site-actions";
 
@@ -305,12 +306,12 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                   placeholder="you@yourbar.com"
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-50"
                 />
-                <button
-                  type="submit"
+                <ActionButton
+                  pendingText="Sending…"
                   className="hover-lift rounded-xl border border-amber-500 px-6 py-3 font-bold text-amber-300 hover:bg-amber-950"
                 >
                   Talk trivia
-                </button>
+                </ActionButton>
               </form>
             )}
             {inquiry === "error" && inquiryWhy && (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ActionButton } from "../action-button";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -124,12 +125,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             Promo kit
           </Link>
           <form action="/auth/signout" method="post">
-            <button
-              type="submit"
+            <ActionButton
+              pendingText="Signing out…"
               className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-300 hover:border-zinc-500"
             >
               Sign out
-            </button>
+            </ActionButton>
           </form>
         </div>
       </header>
@@ -182,21 +183,20 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 {pack.status === "live" ? (
                   <div className="mt-auto flex gap-2">
                     <form action={startGame.bind(null, pack.id)} className="flex-1">
-                      <button
-                        type="submit"
+                      <ActionButton
+                        pendingText="Starting…"
                         className="w-full rounded-xl bg-amber-400 px-4 py-2.5 font-semibold text-zinc-950 hover:bg-amber-300"
                       >
                         Start tonight&apos;s game
-                      </button>
+                      </ActionButton>
                     </form>
                     <form action={retireVenuePack.bind(null, pack.id)}>
-                      <button
-                        type="submit"
+                      <ActionButton
+                        pendingText="…"
                         className="rounded-xl border border-zinc-700 px-3 py-2.5 text-sm text-zinc-400 hover:border-red-800 hover:text-red-400"
-                        title="Retire this pack"
                       >
                         Retire
-                      </button>
+                      </ActionButton>
                     </form>
                   </div>
                 ) : (
@@ -245,12 +245,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 {pack.description && <p className="text-sm text-zinc-400">{pack.description}</p>}
               </div>
               <form action={startGame.bind(null, pack.id)} className="mt-auto">
-                <button
-                  type="submit"
+                <ActionButton
+                  pendingText="Starting…"
                   className="w-full rounded-xl bg-amber-400 px-4 py-2.5 font-semibold text-zinc-950 hover:bg-amber-300"
                 >
                   Start tonight&apos;s game
-                </button>
+                </ActionButton>
               </form>
             </article>
           ))}
@@ -329,12 +329,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 </span>
               </label>
             ))}
-            <button
-              type="submit"
+            <ActionButton
+              pendingText="Saving…"
               className="mt-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:border-amber-400"
             >
               Save defaults
-            </button>
+            </ActionButton>
           </form>
         </section>
 
@@ -369,12 +369,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-50"
               />
             </label>
-            <button
-              type="submit"
+            <ActionButton
+              pendingText="Requesting…"
               className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950"
             >
               Request pack
-            </button>
+            </ActionButton>
             {(requests ?? []).length > 0 && (
               <ul className="mt-1 flex flex-col gap-1 text-xs text-zinc-400" data-testid="request-list">
                 {(requests ?? []).map((r) => (
@@ -402,12 +402,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-50"
               />
             </label>
-            <button
-              type="submit"
+            <ActionButton
+              pendingText="Sending…"
               className="self-start rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:border-amber-400"
             >
               Send feedback
-            </button>
+            </ActionButton>
           </form>
         </section>
       </div>

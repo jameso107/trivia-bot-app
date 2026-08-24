@@ -5,6 +5,7 @@
 // the venue funnel, so it stays one step, no fluff.
 import { useState } from "react";
 import { signupVenue } from "./actions";
+import { ActionButton } from "../action-button";
 
 function slugify(name: string): string {
   return name
@@ -81,12 +82,12 @@ export function FirstRunWizard({ error }: { error: string | null }) {
             {error}
           </p>
         )}
-        <button
-          type="submit"
+        <ActionButton
+          pendingText="Creating your venue…"
           className="rounded-xl bg-amber-400 px-4 py-3 text-lg font-bold text-zinc-950 hover:bg-amber-300"
         >
           Create my venue
-        </button>
+        </ActionButton>
       </form>
     </section>
   );

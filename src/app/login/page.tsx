@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { displayFont } from "../fonts";
 import { sendMagicLink } from "./actions";
+import { ActionButton } from "../action-button";
 
 export const metadata = { title: "Sign in — TRIVIUM" };
 
@@ -50,12 +51,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
                 {error}
               </p>
             ) : null}
-            <button
-              type="submit"
+            <ActionButton
+              pendingText="Sending your link…"
               className="hover-lift rounded-lg bg-amber-400 px-4 py-2.5 font-semibold text-zinc-950 hover:bg-amber-300"
             >
               Email me a sign-in link
-            </button>
+            </ActionButton>
           </form>
         )}
       </div>

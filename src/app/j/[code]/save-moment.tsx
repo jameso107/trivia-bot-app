@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionButton } from "../../action-button";
+
 // The sacred moment (PRD §1/§7): the night just ended, the player is warm,
 // and one email field turns them into an account. Never gates play — it's
 // an offer, not a wall.
@@ -50,12 +52,12 @@ function FeedbackNudge({ gameId }: { gameId: string }) {
           data-testid="player-feedback-body"
           className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-50"
         />
-        <button
-          type="submit"
+        <ActionButton
+          pendingText="Sending…"
           className="self-center rounded-lg border border-zinc-700 px-3 py-1.5 text-zinc-300 hover:border-amber-400"
         >
           Send
-        </button>
+        </ActionButton>
       </form>
     </details>
   );

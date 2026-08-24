@@ -221,3 +221,29 @@ body {
   .hover-lift, .hover-lift:hover, .hover-lift:active { transform: none; }
   .nav-underline::after { transition: none; }
 }
+
+/* Tactile buttons (owner request 2026-08-24): every button in the product
+   visibly presses, reads busy while disabled, and shows keyboard focus.
+   @layer base so per-surface Tailwind utilities (player answer buttons,
+   builder) still win where they specialize. */
+@layer base {
+  button {
+    transition:
+      transform 100ms var(--ease-snap, ease),
+      opacity 120ms ease,
+      background-color 120ms ease,
+      border-color 120ms ease;
+  }
+  button:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+  }
+}
