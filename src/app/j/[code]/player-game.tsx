@@ -14,6 +14,7 @@ import {
 import { useGameChannel } from "@/lib/game/use-game-channel";
 import { createClient } from "@/lib/supabase/client";
 import { useCreative, useImpression } from "@/lib/game/use-creative";
+import { FALSE_STYLE, optionStyle, TRUE_STYLE } from "@/lib/game/palette";
 import { SaveMoment } from "./save-moment";
 import type {
   LobbyEvent,
@@ -369,8 +370,9 @@ export function PlayerGame({ code }: { code: string }) {
         )}
 
         {state.state === "podium" && myStanding && (
-          <div className="flex flex-col gap-2 text-center" data-testid="podium">
-            <h1 className="text-3xl font-black">
+          <div className="relative flex flex-col gap-2 overflow-hidden text-center" data-testid="podium">
+            {myStanding.rank === 1 && <PhoneConfetti />}
+            <h1 className="animate-pop-in text-3xl font-black">
               {myStanding.rank === 1 ? "🏆 Champions!" : `#${myStanding.rank}`}
             </h1>
             <p className="text-lg text-zinc-300">
@@ -416,36 +418,44 @@ function AnswerForm({
 
       {question.format === "multiple_choice" && question.options && (
         <div className="flex flex-col gap-3">
-          {question.options.map((opt, i) => (
-            <button
-              key={i}
-              type="button"
-              data-testid={`option-${i}`}
-              onClick={() => onSubmit({ choice: i, ...wagerPart })}
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-4 text-left text-lg hover:border-amber-400"
-            >
-              <span className="mr-3 font-black text-amber-400">
-                {String.fromCharCode(65 + i)}
-              </span>
-              {opt}
-            </button>
-          ))}
+          {question.options.map((opt, i) => {
+            const s = optionStyle(i);
+            return (
+              <button
+                key={i}
+                type="button"
+                data-testid={`option-${i}`}
+                onClick={() => onSubmit({ choice: i, ...wagerPart })}
+                className={`rounded-xl border px-4 py-4 text-left text-lg font-semibold transition-transform active:scale-[0.97] ${s.solid} ${s.text}`}
+              >
+                <span
+                  className={`mr-3 inline-flex h-8 w-8 items-center justify-center rounded-full font-black ${s.chip}`}
+                >
+                  {String.fromCharCode(65 + i)}
+                </span>
+                {opt}
+              </button>
+            );
+          })}
         </div>
       )}
 
       {question.format === "true_false" && (
         <div className="grid grid-cols-2 gap-3">
-          {[true, false].map((v) => (
-            <button
-              key={String(v)}
-              type="button"
-              data-testid={`option-${v}`}
-              onClick={() => onSubmit({ choice: v, ...wagerPart })}
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-6 text-xl font-bold hover:border-amber-400"
-            >
-              {v ? "True" : "False"}
-            </button>
-          ))}
+          {[true, false].map((v) => {
+            const s = v ? TRUE_STYLE : FALSE_STYLE;
+            return (
+              <button
+                key={String(v)}
+                type="button"
+                data-testid={`option-${v}`}
+                onClick={() => onSubmit({ choice: v, ...wagerPart })}
+                className={`rounded-xl border px-4 py-6 text-xl font-black transition-transform active:scale-[0.97] ${s.solid} ${s.text}`}
+              >
+                {v ? "True" : "False"}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -523,7 +533,13 @@ function RevealCard({ state, identity }: { state: StatePayload; identity: Identi
 
   return (
     <div className="flex flex-col gap-2 text-center" data-testid="reveal-card">
-      <h1 className={`text-3xl font-black ${verdict.cls}`} data-testid="reveal-verdict">
+      <h1
+        className={`text-3xl font-black ${verdict.cls} ${
+          !mine?.answered ? "" : mine.isCorrect ? "animate-pop-in" : "animate-shake"
+        }`}
+        data-testid="reveal-verdict"
+      >
+        {mine?.answered && mine.isCorrect ? "🎉 " : ""}
         {verdict.text}
       </h1>
       <p className="text-zinc-400">Answer + source on the big screen.</p>
@@ -545,6 +561,25 @@ function RevealCard({ state, identity }: { state: StatePayload; identity: Identi
           Think we&apos;re wrong? Challenge this question
         </button>
       )}
+    </div>
+  );
+}
+
+function PhoneConfetti() {
+  const colors = ["#e11d48", "#0ea5e9", "#fbbf24", "#10b981"];
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {Array.from({ length: 14 }, (_, i) => (
+        <span
+          key={i}
+          className="animate-confetti absolute top-0 block h-2.5 w-1.5 rounded-sm"
+          style={{
+            left: `${(i * 41) % 100}%`,
+            backgroundColor: colors[i % colors.length],
+            animationDelay: `${(i % 7) * 0.4}s`,
+          }}
+        />
+      ))}
     </div>
   );
 }

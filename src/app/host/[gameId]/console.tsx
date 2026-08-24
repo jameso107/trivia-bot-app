@@ -18,6 +18,8 @@ import {
   type LinePicker,
 } from "@/lib/game/host-lines";
 import { useCreative, useImpression } from "@/lib/game/use-creative";
+import { music } from "@/lib/game/music";
+import { FALSE_STYLE, optionStyle, ROUND_WASH, TRUE_STYLE } from "@/lib/game/palette";
 import type {
   GameStateName,
   LobbyEvent,
@@ -231,20 +233,102 @@ export function Console({
     return () => clearTimeout(id);
   }, [state, tick, autoHost, paused, advance]);
 
-  // Manual override (PRD §6): space advances, p pauses/resumes the engine.
+  // Manual override (PRD §6): space advances, p pauses/resumes, m mutes music.
+  const [musicMuted, setMusicMuted] = useState(false);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      music.resume(); // browsers unlock audio on a user gesture
       if (e.code === "Space") {
         e.preventDefault();
         void advance();
       } else if (e.code === "KeyP") {
         e.preventDefault();
         setPaused((p) => !p);
+      } else if (e.code === "KeyM") {
+        e.preventDefault();
+        setMusicMuted((m) => {
+          music.setMuted(!m);
+          return !m;
+        });
       }
     };
+    const onPointer = () => music.resume();
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointer);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointer);
+    };
   }, [advance]);
+
+  // The soundtrack (fun pass): venue-opt-in synthesized music tracks the
+  // beat of the night. Urgency kicks in for the last seconds of a question.
+  const musicOn = state?.settings.music_enabled === true;
+  const [urgent, setUrgent] = useState(false);
+  useEffect(() => {
+    const deadlineTs = state?.deadlineTs;
+    const skew = state ? Date.parse(state.serverNowTs) - Date.now() : 0;
+    const id = setInterval(() => {
+      if (!deadlineTs) {
+        setUrgent(false);
+        return;
+      }
+      const left = (Date.parse(deadlineTs) - (Date.now() + skew)) / 1000;
+      setUrgent(left <= 8 && left > 0);
+    }, 500);
+    return () => clearInterval(id);
+  }, [state?.deadlineTs, state?.serverNowTs, state]);
+  useEffect(() => {
+    if (!musicOn) {
+      music.setMode("off");
+      return;
+    }
+    const s = state?.state;
+    if (s === "lobby" || s === "intermission" || s === "scores" || s === "round_intro") {
+      music.setMode("lobby");
+    } else if (s === "question" || s === "final_question" || s === "locked") {
+      music.setMode(urgent && s !== "locked" ? "urgent" : "question");
+    } else if (s === "reveal") {
+      music.setMode("reveal");
+    } else if (s === "podium") {
+      music.setMode("podium");
+    } else {
+      music.setMode("off");
+    }
+  }, [musicOn, state?.state, urgent]);
+  useEffect(() => () => music.setMode("off"), []);
+
+  // Streaks (fun pass): consecutive correct answers per team, tracked from
+  // reveals in memory only — a console refresh forgets them, and that's fine
+  // for a cosmetic flame. State (not a ref) because the render reads it.
+  const [streaks, setStreaks] = useState<ReadonlyMap<string, number>>(new Map());
+  const lastStreakQRef = useRef<string>("");
+  useEffect(() => {
+    const reveal = state?.state === "reveal" ? state.reveal : null;
+    if (!reveal || reveal.questionId === lastStreakQRef.current) return;
+    lastStreakQRef.current = reveal.questionId;
+    setStreaks((prev) => {
+      const next = new Map(prev);
+      for (const t of reveal.teamResults) {
+        next.set(t.teamId, t.answered && t.isCorrect ? (prev.get(t.teamId) ?? 0) + 1 : 0);
+      }
+      return next;
+    });
+  }, [state]);
+
+  // Rank movement arrows: remember last standings, show who climbed.
+  const [prevRanks, setPrevRanks] = useState<ReadonlyMap<string, number>>(new Map());
+  const rankDelta = (teamId: string, rank: number): number => {
+    const prev = prevRanks.get(teamId);
+    return prev === undefined ? 0 : prev - rank;
+  };
+  useEffect(() => {
+    if (state?.state === "scores" || state?.state === "podium") {
+      const snapshot = new Map(state.leaderboard.map((t) => [t.teamId, t.rank]));
+      const id = setTimeout(() => setPrevRanks(snapshot), 600);
+      return () => clearTimeout(id);
+    }
+  }, [state]);
 
   if (!state) {
     return (
@@ -264,6 +348,11 @@ export function Console({
           {state.packTitle || "TRIVIUM"}
         </span>
         <span className="flex items-center gap-6">
+          {musicOn && (
+            <span className="rounded-full border border-zinc-800 px-4 py-1 text-base uppercase tracking-widest text-zinc-400">
+              {musicMuted ? "music muted" : "♪ music"} <kbd className="ml-1">m</kbd>
+            </span>
+          )}
           <span
             data-testid="auto-status"
             data-paused={paused}
@@ -314,8 +403,10 @@ export function Console({
         )}
 
         {state.state === "round_intro" && (
-          <div className="flex flex-col items-center gap-6">
-            <h1 className="animate-beat-in text-7xl font-black">Round {state.round}</h1>
+          <div
+            className={`flex w-full flex-col items-center gap-6 rounded-3xl bg-gradient-to-b to-transparent py-24 ${ROUND_WASH[(state.round - 1) % ROUND_WASH.length]}`}
+          >
+            <h1 className="animate-pop-in text-8xl font-black tracking-tight">Round {state.round}</h1>
             {sponsorSlot && creative && (
               <p className="text-2xl text-zinc-400" data-testid="sponsor-strap">
                 brought to you by{" "}
@@ -337,16 +428,38 @@ export function Console({
                 {state.question.prompt}
               </h1>
               {state.question.options && (
-                <ol className="grid w-full grid-cols-2 gap-6 text-left text-[48px]">
-                  {state.question.options.map((opt, i) => (
-                    <li key={i} className="rounded-2xl border border-zinc-700 bg-zinc-900 px-8 py-5">
-                      <span className="mr-4 font-black text-amber-400">
-                        {String.fromCharCode(65 + i)}
-                      </span>
-                      {opt}
-                    </li>
-                  ))}
+                <ol className="grid w-full grid-cols-2 gap-6 text-left text-[44px]">
+                  {state.question.options.map((opt, i) => {
+                    const s = optionStyle(i);
+                    return (
+                      <li
+                        key={i}
+                        className={`animate-pop-in rounded-2xl border px-8 py-5 font-semibold ${s.solid} ${s.text}`}
+                        style={{ animationDelay: `${i * 90}ms` }}
+                      >
+                        <span
+                          className={`mr-4 inline-flex h-14 w-14 items-center justify-center rounded-full text-4xl font-black ${s.chip}`}
+                        >
+                          {String.fromCharCode(65 + i)}
+                        </span>
+                        {opt}
+                      </li>
+                    );
+                  })}
                 </ol>
+              )}
+              {state.question.format === "true_false" && (
+                <div className="grid w-full max-w-3xl grid-cols-2 gap-6 text-[52px] font-black">
+                  <div className={`animate-pop-in rounded-2xl px-8 py-8 text-center ${TRUE_STYLE.solid} ${TRUE_STYLE.text}`}>
+                    True
+                  </div>
+                  <div
+                    className={`animate-pop-in rounded-2xl px-8 py-8 text-center ${FALSE_STYLE.solid} ${FALSE_STYLE.text}`}
+                    style={{ animationDelay: "90ms" }}
+                  >
+                    False
+                  </div>
+                </div>
               )}
               <div className="flex items-center gap-12 text-4xl text-zinc-400">
                 {state.deadlineTs ? (
@@ -375,15 +488,16 @@ export function Console({
         )}
 
         {state.state === "reveal" && state.question && state.reveal && (
-          <RevealPanel key={state.question.id} state={state} />
+          <RevealPanel key={state.question.id} state={state} streaks={streaks} />
         )}
 
         {(state.state === "scores" ||
           state.state === "intermission" ||
           state.state === "podium") && (
-          <div className="flex w-full max-w-4xl animate-beat-in flex-col items-center gap-8">
-            <h1 className="text-6xl font-black">
-              {state.state === "podium" ? "Final standings" : `Scores — round ${state.round}`}
+          <div className="relative flex w-full max-w-4xl animate-beat-in flex-col items-center gap-8">
+            {state.state === "podium" && <Confetti />}
+            <h1 className={`font-black ${state.state === "podium" ? "animate-pop-in text-7xl" : "text-6xl"}`}>
+              {state.state === "podium" ? "🏆 Final standings" : `Scores — round ${state.round}`}
             </h1>
             {state.state === "intermission" && sponsorSlot && creative && (
               <aside
@@ -404,7 +518,11 @@ export function Console({
                   data-team={t.name}
                   data-score={t.score}
                   style={{ transitionDelay: `${i * 120}ms` }}
-                  className="flex justify-between border-b border-zinc-800 py-3"
+                  className={`flex justify-between border-b border-zinc-800 py-3 ${
+                    state.state === "podium" && t.rank === 1
+                      ? "animate-pop-in rounded-xl bg-amber-400/10 px-4"
+                      : ""
+                  }`}
                 >
                   <span>
                     <span
@@ -417,6 +535,17 @@ export function Console({
                       {t.rank}
                     </span>
                     {t.name}
+                    {(streaks.get(t.teamId) ?? 0) >= 2 && (
+                      <span className="ml-4 rounded-full bg-orange-500/15 px-3 py-1 text-2xl text-orange-400">
+                        🔥 {streaks.get(t.teamId)}
+                      </span>
+                    )}
+                    {rankDelta(t.teamId, t.rank) > 0 && (
+                      <span className="ml-3 text-2xl text-emerald-400">▲</span>
+                    )}
+                    {rankDelta(t.teamId, t.rank) < 0 && (
+                      <span className="ml-3 text-2xl text-rose-400">▼</span>
+                    )}
                   </span>
                   <span className="font-bold">{t.score}</span>
                 </li>
@@ -494,13 +623,14 @@ export function Console({
   );
 }
 
-// Reveal choreography (PRD §6): options dim → 1.5s hold → answer highlight +
-// source note → score deltas stagger in.
-function RevealPanel({ state }: { state: StatePayload }) {
+// Reveal choreography (PRD §6, fun pass): options hold their colors → the
+// wrong ones drain away and the right one pulses → the room's vote bars grow
+// in (the Kahoot histogram moment) → score deltas stagger in.
+function RevealPanel({ state, streaks }: { state: StatePayload; streaks: ReadonlyMap<string, number> }) {
   const [phase, setPhase] = useState<"dim" | "answer" | "deltas">("dim");
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("answer"), 1500);
-    const t2 = setTimeout(() => setPhase("deltas"), 3000);
+    const t2 = setTimeout(() => setPhase("deltas"), 3200);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -510,6 +640,32 @@ function RevealPanel({ state }: { state: StatePayload }) {
   const q = state.question!;
   const reveal = state.reveal!;
   const showAnswer = phase !== "dim";
+  const counts = reveal.optionCounts ?? null;
+  const totalVotes = counts ? counts.reduce((a, b) => a + b, 0) : 0;
+
+  const voteBar = (i: number, label: string, styleIdx: number, isCorrect: boolean) => {
+    const n = counts?.[i] ?? 0;
+    const pct = totalVotes > 0 ? Math.max(6, Math.round((n / totalVotes) * 100)) : 0;
+    const s = optionStyle(styleIdx);
+    return (
+      <li key={i} className="flex items-center gap-4 text-3xl">
+        <span className={`w-10 text-center font-black ${isCorrect ? "text-emerald-300" : "text-zinc-400"}`}>
+          {label}
+        </span>
+        <span className="h-9 flex-1 overflow-hidden rounded-full bg-zinc-900">
+          {totalVotes > 0 && (
+            <span
+              className={`animate-bar-grow block h-full rounded-full ${s.bar} ${isCorrect ? "" : "opacity-35"}`}
+              style={{ width: `${pct}%` }}
+            />
+          )}
+        </span>
+        <span className={`w-14 text-right font-bold ${isCorrect ? "text-emerald-300" : "text-zinc-400"}`}>
+          {n}
+        </span>
+      </li>
+    );
+  };
 
   return (
     <div className="flex w-full max-w-6xl flex-col items-center gap-8">
@@ -519,16 +675,23 @@ function RevealPanel({ state }: { state: StatePayload }) {
         <ol className="grid w-full grid-cols-2 gap-6 text-left text-[40px]">
           {q.options.map((opt, i) => {
             const isCorrect = typeof reveal.answer === "number" && reveal.answer === i;
+            const s = optionStyle(i);
             return (
               <li
                 key={i}
-                className={`rounded-2xl border px-8 py-4 transition-all duration-500 ${
-                  showAnswer && isCorrect
-                    ? "border-emerald-400 bg-emerald-950 text-emerald-200"
-                    : "border-zinc-800 bg-zinc-900/60 text-zinc-400"
+                className={`rounded-2xl border px-8 py-4 font-semibold transition-all duration-500 ${
+                  !showAnswer
+                    ? `${s.solid} ${s.text}`
+                    : isCorrect
+                      ? `${s.solid} ${s.text} animate-correct-pulse ring-4 ring-emerald-300`
+                      : "border-zinc-800 bg-zinc-900/60 text-zinc-500 opacity-50"
                 }`}
               >
-                <span className={`mr-4 font-black ${showAnswer && isCorrect ? "text-emerald-300" : "text-zinc-400"}`}>
+                <span
+                  className={`mr-4 inline-flex h-12 w-12 items-center justify-center rounded-full text-3xl font-black ${
+                    !showAnswer || isCorrect ? s.chip : "bg-zinc-800 text-zinc-500"
+                  }`}
+                >
                   {String.fromCharCode(65 + i)}
                 </span>
                 {opt}
@@ -536,6 +699,22 @@ function RevealPanel({ state }: { state: StatePayload }) {
             );
           })}
         </ol>
+      )}
+
+      {/* How the room voted — grows in with the answer. */}
+      {showAnswer && counts && totalVotes > 0 && (
+        <ul className="w-full max-w-3xl space-y-2" data-testid="vote-bars">
+          {q.format === "multiple_choice" && q.options
+            ? q.options.map((_, i) =>
+                voteBar(i, String.fromCharCode(65 + i), i, typeof reveal.answer === "number" && reveal.answer === i),
+              )
+            : q.format === "true_false"
+              ? [
+                  voteBar(0, "T", 3, reveal.answer === true),
+                  voteBar(1, "F", 0, reveal.answer === false),
+                ]
+              : null}
+        </ul>
       )}
 
       <div
@@ -559,7 +738,14 @@ function RevealPanel({ state }: { state: StatePayload }) {
       >
         {reveal.teamResults.map((t) => (
           <li key={t.teamId} className="flex justify-between border-b border-zinc-800 py-2">
-            <span>{t.name}</span>
+            <span>
+              {t.name}
+              {t.answered && t.isCorrect && (streaks.get(t.teamId) ?? 0) >= 2 && (
+                <span className="ml-3 rounded-full bg-orange-500/15 px-3 py-0.5 text-2xl text-orange-400">
+                  🔥 {streaks.get(t.teamId)}
+                </span>
+              )}
+            </span>
             <span
               className={
                 !t.answered
@@ -617,9 +803,39 @@ function QuestionClock({
   }, [remaining]);
 
   return (
-    <span data-testid="console-clock" className={secondsLeft <= 5 ? "font-black text-red-400" : ""}>
+    <span
+      data-testid="console-clock"
+      className={
+        secondsLeft <= 5
+          ? "animate-clock-urgent inline-block font-black text-red-400"
+          : secondsLeft <= 10
+            ? "font-bold text-amber-300"
+            : ""
+      }
+    >
       {secondsLeft}s
     </span>
+  );
+}
+
+// Podium confetti: pure CSS, palette-colored, respects prefers-reduced-motion.
+function Confetti() {
+  const colors = ["#e11d48", "#0ea5e9", "#fbbf24", "#10b981", "#8b5cf6"];
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {Array.from({ length: 28 }, (_, i) => (
+        <span
+          key={i}
+          className="animate-confetti absolute top-0 block h-3 w-2 rounded-sm"
+          style={{
+            left: `${(i * 37) % 100}%`,
+            backgroundColor: colors[i % colors.length],
+            animationDelay: `${(i % 9) * 0.45}s`,
+            animationDuration: `${3 + (i % 5) * 0.5}s`,
+          }}
+        />
+      ))}
+    </div>
   );
 }
 

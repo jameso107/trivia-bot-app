@@ -128,6 +128,7 @@ export interface GameSettings {
   roast_mode?: boolean; // default false (M3)
   tts_enabled?: boolean; // default false (M3)
   sponsor_slot?: boolean; // default false (M6)
+  music_enabled?: boolean; // default false: synthesized console soundtrack (fun pass)
 }
 
 export interface PublicQuestion {
@@ -155,6 +156,10 @@ export interface RevealInfo {
   answer: unknown; // canonical answer, safe to show now
   answerNote: string | null; // "source: ..." — style guide requires it
   teamResults: TeamResult[];
+  // How the room voted (fun pass): per-option answer counts for
+  // multiple_choice (by option index) and true_false ([true, false]).
+  // Optional + additive — older projections simply omit it.
+  optionCounts?: number[] | null;
 }
 
 export interface TeamStanding {

@@ -55,3 +55,50 @@ body {
     animation: none;
   }
 }
+
+/* ── Fun pass (2026-08-24): game-surface animation vocabulary ── */
+@keyframes pop-in {
+  0% { transform: scale(0.85); opacity: 0; }
+  70% { transform: scale(1.04); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop-in { animation: pop-in 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+
+@keyframes correct-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+  50% { box-shadow: 0 0 0 14px rgba(52, 211, 153, 0); }
+}
+.animate-correct-pulse { animation: correct-pulse 1.1s ease-out 2; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+.animate-shake { animation: shake 420ms ease-in-out; }
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-8vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(108vh) rotate(680deg); opacity: 0.7; }
+}
+.animate-confetti { animation: confetti-fall 3.6s linear infinite; }
+
+@keyframes clock-urgent {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+.animate-clock-urgent { animation: clock-urgent 0.9s ease-in-out infinite; }
+
+@keyframes bar-grow {
+  from { width: 0; }
+}
+.animate-bar-grow { animation: bar-grow 700ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop-in, .animate-correct-pulse, .animate-shake,
+  .animate-confetti, .animate-clock-urgent, .animate-bar-grow {
+    animation: none;
+  }
+}

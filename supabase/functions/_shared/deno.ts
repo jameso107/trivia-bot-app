@@ -232,10 +232,34 @@ async function buildRevealInfo(
     .eq("game_id", game.id)
     .eq("question_id", questionRow.id as string);
   const byTeam = new Map((answerRows ?? []).map((a) => [a.team_id as string, a]));
+
+  // How the room voted (fun pass): per-option counts feed the TV's reveal
+  // bar chart. Only choice formats have discrete options to count.
+  const format = questionRow.format as string;
+  let optionCounts: number[] | null = null;
+  if (format === "multiple_choice") {
+    const options = (questionRow.options as unknown[] | null) ?? [];
+    optionCounts = new Array(options.length).fill(0);
+    for (const a of answerRows ?? []) {
+      const choice = (a.payload as Record<string, unknown> | null)?.choice;
+      if (typeof choice === "number" && choice >= 0 && choice < optionCounts.length) {
+        optionCounts[choice]++;
+      }
+    }
+  } else if (format === "true_false") {
+    optionCounts = [0, 0];
+    for (const a of answerRows ?? []) {
+      const choice = (a.payload as Record<string, unknown> | null)?.choice;
+      if (choice === true) optionCounts[0]++;
+      else if (choice === false) optionCounts[1]++;
+    }
+  }
+
   return {
     questionId: questionRow.id as string,
     answer: questionRow.answer,
     answerNote: (questionRow.answer_note as string | null) ?? null,
+    optionCounts,
     teamResults: teamRows.map((t) => {
       const a = byTeam.get(t.id);
       const wagerRaw =
