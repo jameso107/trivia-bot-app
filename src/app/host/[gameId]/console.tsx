@@ -20,6 +20,7 @@ import {
 import { useCreative, useImpression } from "@/lib/game/use-creative";
 import { music } from "@/lib/game/music";
 import { FALSE_STYLE, optionStyle, ROUND_WASH, TRUE_STYLE } from "@/lib/game/palette";
+import { usePreroll } from "@/lib/game/use-preroll";
 import type {
   GameStateName,
   LobbyEvent,
@@ -200,6 +201,13 @@ export function Console({
       setConfirmFinish(false);
     }
   }, [gameId, state]);
+
+  // Read-in preroll: how long until answers open on the current question.
+  const preroll = usePreroll(
+    state?.deadlineTs ?? null,
+    state?.serverNowTs ?? null,
+    state?.question?.timeLimitS ?? null,
+  );
 
   // Sponsor slot (PRD §7): a screen creative in intermission + a strap on
   // round intros, only when the venue opted in via settings.sponsor_slot.
@@ -427,7 +435,20 @@ export function Console({
               <h1 className="text-[64px] font-bold leading-tight" data-testid="question-prompt">
                 {state.question.prompt}
               </h1>
-              {state.question.options && (
+              {preroll > 0 && (
+                <div className="flex flex-col items-center gap-4" data-testid="preroll">
+                  <p className="text-3xl uppercase tracking-widest text-zinc-400">
+                    Read it — answers open in
+                  </p>
+                  <p
+                    key={preroll}
+                    className="animate-pop-in text-[140px] font-black leading-none text-amber-400"
+                  >
+                    {preroll}
+                  </p>
+                </div>
+              )}
+              {preroll === 0 && state.question.options && (
                 <ol className="grid w-full grid-cols-2 gap-6 text-left text-[44px]">
                   {state.question.options.map((opt, i) => {
                     const s = optionStyle(i);
@@ -448,7 +469,7 @@ export function Console({
                   })}
                 </ol>
               )}
-              {state.question.format === "true_false" && (
+              {preroll === 0 && state.question.format === "true_false" && (
                 <div className="grid w-full max-w-3xl grid-cols-2 gap-6 text-[52px] font-black">
                   <div className={`animate-pop-in rounded-2xl px-8 py-8 text-center ${TRUE_STYLE.solid} ${TRUE_STYLE.text}`}>
                     True
@@ -463,12 +484,15 @@ export function Console({
               )}
               <div className="flex items-center gap-12 text-4xl text-zinc-400">
                 {state.deadlineTs ? (
-                  <QuestionClock
-                    key={state.deadlineTs}
-                    deadlineTs={state.deadlineTs}
-                    serverNowTs={state.serverNowTs}
-                    onExpire={advance}
-                  />
+                  <span className={preroll > 0 ? "invisible" : ""}>
+                    <QuestionClock
+                      key={state.deadlineTs}
+                      deadlineTs={state.deadlineTs}
+                      serverNowTs={state.serverNowTs}
+                      timeLimitS={state.question.timeLimitS}
+                      onExpire={advance}
+                    />
+                  </span>
                 ) : null}
                 <span data-testid="answered-tick">
                   {tick?.questionId === state.question.id ? tick.answeredTeams : 0}/
@@ -770,10 +794,12 @@ function RevealPanel({ state, streaks }: { state: StatePayload; streaks: Readonl
 function QuestionClock({
   deadlineTs,
   serverNowTs,
+  timeLimitS,
   onExpire,
 }: {
   deadlineTs: string;
   serverNowTs: string;
+  timeLimitS?: number;
   onExpire: () => Promise<void> | void;
 }) {
   const [skewMs] = useState(() => Date.parse(serverNowTs) - Date.now());
@@ -813,28 +839,81 @@ function QuestionClock({
             : ""
       }
     >
-      {secondsLeft}s
+      {/* During the read-in preroll the raw remaining includes the buffer —
+          cap the display at the answer window (it's hidden then anyway). */}
+      {Math.min(secondsLeft, timeLimitS ?? secondsLeft)}s
     </span>
   );
 }
 
-// Podium confetti: pure CSS, palette-colored, respects prefers-reduced-motion.
+// Podium celebration: confetti that falls like paper (gravity + drift +
+// flutter) and staggered firework bursts. Pure CSS, palette-colored,
+// respects prefers-reduced-motion.
+const CELEBRATION_COLORS = ["#e11d48", "#0ea5e9", "#fbbf24", "#10b981", "#8b5cf6", "#f97316"];
+
+function Firework({ x, y, delay, color }: { x: string; y: string; delay: number; color: string }) {
+  const rays = 12;
+  return (
+    <div className="absolute" style={{ left: x, top: y }}>
+      <span
+        className="animate-firework-flash absolute -left-8 -top-8 block h-16 w-16 rounded-full"
+        style={{ background: `radial-gradient(${color}66, transparent 70%)`, animationDelay: `${delay}s` }}
+      />
+      {Array.from({ length: rays }, (_, i) => {
+        const angle = (i / rays) * Math.PI * 2;
+        const dist = 90 + (i % 3) * 30;
+        return (
+          <span
+            key={i}
+            className="animate-firework absolute block h-2 w-2 rounded-full"
+            style={
+              {
+                backgroundColor: color,
+                boxShadow: `0 0 6px ${color}`,
+                animationDelay: `${delay}s`,
+                "--fx": `${Math.cos(angle) * dist}px`,
+                "--fy": `${Math.sin(angle) * dist + 30}px`,
+              } as React.CSSProperties
+            }
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 function Confetti() {
-  const colors = ["#e11d48", "#0ea5e9", "#fbbf24", "#10b981", "#8b5cf6"];
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      {Array.from({ length: 28 }, (_, i) => (
+      {Array.from({ length: 36 }, (_, i) => (
         <span
           key={i}
-          className="animate-confetti absolute top-0 block h-3 w-2 rounded-sm"
-          style={{
-            left: `${(i * 37) % 100}%`,
-            backgroundColor: colors[i % colors.length],
-            animationDelay: `${(i % 9) * 0.45}s`,
-            animationDuration: `${3 + (i % 5) * 0.5}s`,
-          }}
-        />
+          className="animate-confetti absolute top-0"
+          style={
+            {
+              left: `${(i * 29 + 7) % 100}%`,
+              animationDelay: `${((i * 13) % 34) / 10}s`,
+              animationDuration: `${3.1 + ((i * 7) % 22) / 10}s`,
+              "--drift": `${((i % 7) - 3) * 34}px`,
+            } as React.CSSProperties
+          }
+        >
+          <span
+            className="animate-flutter rounded-[2px]"
+            style={{
+              width: `${6 + (i % 3) * 3}px`,
+              height: `${9 + ((i * 5) % 4) * 3}px`,
+              backgroundColor: CELEBRATION_COLORS[i % CELEBRATION_COLORS.length],
+              animationDelay: `${(i % 5) * 0.17}s`,
+              animationDuration: `${0.9 + (i % 4) * 0.22}s`,
+            }}
+          />
+        </span>
       ))}
+      <Firework x="18%" y="26%" delay={0} color="#fbbf24" />
+      <Firework x="76%" y="20%" delay={1.1} color="#0ea5e9" />
+      <Firework x="50%" y="12%" delay={2.2} color="#e11d48" />
+      <Firework x="32%" y="18%" delay={0.6} color="#10b981" />
     </div>
   );
 }

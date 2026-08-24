@@ -132,8 +132,17 @@ async function handle(req: Request): Promise<Response> {
     if (!qRow) return jsonError("pack has no question at that slot", 422);
     enteringQuestionId = qRow.id as string;
     patch.question_started_at = nowIso;
+    // Read-in buffer (fun pass): teams get a beat to READ before answers
+    // open. The deadline includes it, so the full time limit remains for
+    // answering; clients derive the boundary as deadline − time_limit.
+    const settingsForRead = (game.settings ?? {}) as { read_seconds?: number };
+    const baseRead =
+      typeof settingsForRead.read_seconds === "number" && settingsForRead.read_seconds >= 0
+        ? Math.min(settingsForRead.read_seconds, 20)
+        : 5;
+    const readS = next.state === "final_question" ? baseRead + (baseRead > 0 ? 3 : 0) : baseRead;
     patch.question_deadline = new Date(
-      Date.now() + (qRow.time_limit_s as number) * 1000,
+      Date.now() + (readS + (qRow.time_limit_s as number)) * 1000,
     ).toISOString();
   }
   if (cur.state === "lobby") patch.started_at = nowIso;

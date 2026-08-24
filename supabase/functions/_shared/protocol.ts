@@ -129,6 +129,11 @@ export interface GameSettings {
   tts_enabled?: boolean; // default false (M3)
   sponsor_slot?: boolean; // default false (M6)
   music_enabled?: boolean; // default false: synthesized console soundtrack (fun pass)
+  // Read-in buffer before answers open: the server arms the deadline as
+  // now + read + time_limit, so the buffer never eats answer time. Clients
+  // derive the boundary as deadline − timeLimitS (no extra wire field).
+  // Default 5s (finals +3). 0 disables — E2E fixtures use that.
+  read_seconds?: number;
 }
 
 export interface PublicQuestion {

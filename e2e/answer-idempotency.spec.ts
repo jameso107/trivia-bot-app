@@ -193,7 +193,7 @@ test("team edits: identical retries are free, edits cap at 3, timestamps move on
   const admin = adminClient();
   await admin
     .from("games")
-    .update({ settings: { speed_bonus: true, team_edits: true } })
+    .update({ settings: { speed_bonus: true, team_edits: true, read_seconds: 0 } })
     .eq("id", night.gameId);
   const token = await hostAccessToken(night.hostEmail);
 
