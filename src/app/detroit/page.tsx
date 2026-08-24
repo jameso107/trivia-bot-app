@@ -3,6 +3,7 @@
 // same shape as pilots land.
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "../site-chrome";
+import { displayFont } from "../fonts";
 
 export const metadata = {
   title: "Trivia night in Detroit — TRIVIUM",
@@ -14,11 +15,11 @@ export default function DetroitPage() {
   return (
     <>
       <SiteNav />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
+      <main className={`site-atmosphere mx-auto w-full max-w-3xl flex-1 px-6 py-16 ${displayFont.variable}`}>
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-400">
           Metro Detroit
         </p>
-        <h1 className="mt-3 text-[clamp(2.25rem,5vw,3.5rem)] font-black leading-[1.05] tracking-[-0.02em] text-zinc-50">
+        <h1 className="mt-3 text-[clamp(2.25rem,5vw,3.5rem)] enter-up font-display font-extrabold leading-[1.05] tracking-[-0.02em] text-zinc-50">
           Trivia night in Detroit
         </h1>
         <p className="mt-5 text-lg leading-8 text-zinc-400">
@@ -27,7 +28,7 @@ export default function DetroitPage() {
           Detroit now and adding venues every week.
         </p>
 
-        <h2 className="mt-12 text-2xl font-bold text-zinc-100">What a night looks like</h2>
+        <h2 className="mt-12 font-display text-2xl font-bold text-zinc-100">What a night looks like</h2>
         <ul className="mt-4 flex flex-col gap-3 leading-7 text-zinc-400">
           <li>· Quick rounds of ten with a live on-screen host and a final wager.</li>
           <li>· Join by scanning the QR on the big screen — no app, no signup.</li>
@@ -35,7 +36,7 @@ export default function DetroitPage() {
           <li>· Save your result after the game and your streak follows you to any TRIVIUM bar.</li>
         </ul>
 
-        <h2 className="mt-12 text-2xl font-bold text-zinc-100">Run it at your Detroit bar</h2>
+        <h2 className="mt-12 font-display text-2xl font-bold text-zinc-100">Run it at your Detroit bar</h2>
         <p className="mt-4 leading-8 text-zinc-400">
           TRIVIUM is free for venues: the whole night runs itself from any computer plugged into
           a TV. Ten minutes from signup to your first live game, a promo kit for the door, and a

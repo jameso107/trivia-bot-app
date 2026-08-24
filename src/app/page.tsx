@@ -4,6 +4,8 @@
 // one gentle hero float, disabled under prefers-reduced-motion (globals).
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "./site-chrome";
+import { displayFont } from "./fonts";
+import { Reveal } from "./reveal";
 import { submitInquiry } from "./site-actions";
 
 export const metadata = {
@@ -93,26 +95,27 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   return (
     <>
       <SiteNav />
-      <main className="flex flex-1 flex-col">
+      <main className={`site-atmosphere flex flex-1 flex-col ${displayFont.variable}`}>
+        <div className="site-grain" aria-hidden="true" />
         {/* ---- hero: outcome headline + the product itself ---- */}
         <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-6 pb-20 pt-16 lg:grid-cols-2 lg:pt-24">
           <div className="flex flex-col items-start gap-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-400">
+            <p className="enter-up text-sm font-semibold uppercase tracking-[0.3em] text-amber-400" style={{ "--stagger": "0ms" } as React.CSSProperties}>
               Free for venues · no host needed · ten-minute setup
             </p>
-            <h1 className="text-[clamp(2.75rem,6vw,4.5rem)] font-black leading-[1.02] tracking-[-0.02em] text-zinc-50">
+            <h1 className="enter-up font-display text-[clamp(2.75rem,6vw,4.5rem)] font-extrabold leading-[1.02] tracking-[-0.03em] text-zinc-50" style={{ "--stagger": "90ms" } as React.CSSProperties}>
               Trivia night
               <br />
               runs itself.
             </h1>
-            <p className="max-w-md text-lg leading-8 text-zinc-400">
+            <p className="enter-up max-w-md text-lg leading-8 text-zinc-400" style={{ "--stagger": "180ms" } as React.CSSProperties}>
               TRIVIUM turns any TV into a self-hosting trivia night. Players join by QR in
               seconds — the bar keeps the packed Tuesday and skips the $200 host.
             </p>
-            <div className="flex flex-col items-start gap-3">
+            <div className="enter-up flex flex-col items-start gap-3" style={{ "--stagger": "270ms" } as React.CSSProperties}>
               <Link
                 href="/login"
-                className="rounded-xl bg-amber-400 px-7 py-3.5 text-lg font-bold text-zinc-950 transition-transform hover:bg-amber-300 active:scale-[0.97]"
+                className="hover-lift rounded-xl bg-amber-400 px-7 py-3.5 text-lg font-bold text-zinc-950 hover:bg-amber-300"
               >
                 Run trivia at your bar
               </Link>
@@ -123,7 +126,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           </div>
 
           {/* the product, not an illustration: TV + phone built from the real UI */}
-          <div className="relative mx-auto w-full max-w-lg" aria-hidden="true">
+          <div className="enter-up relative mx-auto w-full max-w-lg" aria-hidden="true" style={{ "--stagger": "200ms" } as React.CSSProperties}>
             <div className="hero-float rounded-2xl border border-zinc-700 bg-zinc-900 p-3 shadow-2xl shadow-black/50">
               <div className="rounded-lg bg-zinc-950 p-6">
                 <div className="flex items-center justify-between text-xs uppercase tracking-wider text-zinc-400">
@@ -166,18 +169,18 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         {/* ---- how it works ---- */}
         <section id="how" className="border-t border-zinc-900 bg-zinc-900/40">
           <div className="mx-auto w-full max-w-6xl px-6 py-20">
-            <h2 className="text-3xl font-black tracking-[-0.01em] text-zinc-50">
+            <Reveal><h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-zinc-50">
               Three steps. Zero staff.
-            </h2>
+            </h2></Reveal>
             <div className="mt-10 grid gap-8 md:grid-cols-3">
-              {STEPS.map((s) => (
-                <div key={s.n} className="flex flex-col gap-3">
+              {STEPS.map((s, si) => (
+                <Reveal key={s.n} delay={si * 110} className="flex flex-col gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-400 text-lg font-black text-zinc-950">
                     {s.n}
                   </span>
                   <h3 className="text-xl font-bold text-zinc-100">{s.title}</h3>
                   <p className="leading-7 text-zinc-400">{s.body}</p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -185,14 +188,14 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
         {/* ---- features bento ---- */}
         <section className="mx-auto w-full max-w-6xl px-6 py-20">
-          <h2 className="text-3xl font-black tracking-[-0.01em] text-zinc-50">
+          <Reveal><h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-zinc-50">
             Everything a great night needs.
-          </h2>
+          </h2></Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                className={`rounded-2xl border border-zinc-800 bg-zinc-900 p-6 ${
+                className={`hover-lift rounded-2xl border border-zinc-800 bg-zinc-900 p-6 ${
                   f.big ? "lg:col-span-2" : ""
                 }`}
               >
@@ -200,7 +203,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 <p className="mt-2 leading-7 text-zinc-400">{f.body}</p>
               </div>
             ))}
-            <div className="rounded-2xl border border-amber-500/40 bg-amber-400/5 p-6">
+            <div className="hover-lift rounded-2xl border border-amber-500/40 bg-amber-400/5 p-6">
               <h3 className="text-lg font-bold text-amber-300">Made in Detroit</h3>
               <p className="mt-2 leading-7 text-zinc-400">
                 Piloting across Metro Detroit bars now — early venues shape the roadmap.
@@ -212,11 +215,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         {/* ---- pricing ---- */}
         <section id="pricing" className="border-t border-zinc-900">
           <div className="mx-auto w-full max-w-6xl px-6 py-20">
-            <h2 className="text-3xl font-black tracking-[-0.01em] text-zinc-50">
+            <Reveal><h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-zinc-50">
               Free. Actually free.
-            </h2>
+            </h2></Reveal>
             <div className="mt-10 grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-zinc-700 bg-zinc-900 p-8">
+              <div className="hover-lift rounded-2xl border border-zinc-700 bg-zinc-900 p-8">
                 <p className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
                   Every night
                 </p>
@@ -230,12 +233,12 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 </ul>
                 <Link
                   href="/login"
-                  className="mt-6 inline-block rounded-xl bg-amber-400 px-6 py-3 font-bold text-zinc-950 transition-transform hover:bg-amber-300 active:scale-[0.97]"
+                  className="hover-lift mt-6 inline-block rounded-xl bg-amber-400 px-6 py-3 font-bold text-zinc-950 hover:bg-amber-300"
                 >
                   Start tonight
                 </Link>
               </div>
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">
+              <div className="hover-lift rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">
                 <p className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
                   Premium (soon)
                 </p>
@@ -253,9 +256,9 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         {/* ---- FAQ ---- */}
         <section id="faq" className="border-t border-zinc-900">
           <div className="mx-auto w-full max-w-3xl px-6 py-20">
-            <h2 className="text-3xl font-black tracking-[-0.01em] text-zinc-50">
+            <Reveal><h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-zinc-50">
               Questions bars actually ask
-            </h2>
+            </h2></Reveal>
             <div className="mt-8 flex flex-col divide-y divide-zinc-900">
               {FAQ.map((f) => (
                 <details key={f.q} className="group py-4">
@@ -275,9 +278,9 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         {/* ---- inbound: talk to us ---- */}
         <section id="talk" className="border-t border-zinc-900 bg-zinc-900/40">
           <div className="mx-auto w-full max-w-3xl px-6 py-20 text-center">
-            <h2 className="text-3xl font-black tracking-[-0.01em] text-zinc-50">
+            <Reveal><h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-zinc-50">
               Not ready to click a button? Fair.
-            </h2>
+            </h2></Reveal>
             <p className="mx-auto mt-3 max-w-lg text-zinc-400">
               Leave an email and we&apos;ll reach out with a one-pager, a demo night offer, and
               zero follow-up spam.
@@ -304,7 +307,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 />
                 <button
                   type="submit"
-                  className="rounded-xl border border-amber-500 px-6 py-3 font-bold text-amber-300 transition-transform hover:bg-amber-950 active:scale-[0.97]"
+                  className="hover-lift rounded-xl border border-amber-500 px-6 py-3 font-bold text-amber-300 hover:bg-amber-950"
                 >
                   Talk trivia
                 </button>

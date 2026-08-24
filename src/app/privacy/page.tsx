@@ -1,6 +1,7 @@
 // Privacy policy — adapted from the org contracts agent's draft (2026-08-21),
 // rebranded per D-011. Counsel review remains on the owner checklist.
 import { SiteFooter, SiteNav } from "../site-chrome";
+import { displayFont } from "../fonts";
 
 export const metadata = { title: "Privacy — TRIVIUM" };
 
@@ -59,12 +60,12 @@ export default function PrivacyPage() {
   return (
     <>
       <SiteNav />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
-        <h1 className="text-4xl font-black tracking-[-0.02em] text-zinc-50">Privacy</h1>
+      <main className={`site-atmosphere mx-auto w-full max-w-3xl flex-1 px-6 py-16 ${displayFont.variable}`}>
+        <h1 className="text-4xl enter-up font-display font-extrabold tracking-[-0.02em] text-zinc-50">Privacy</h1>
         <p className="mt-2 text-sm text-zinc-400">Effective 2026-08-21</p>
         {SECTIONS.map((s) => (
           <section key={s.h} className="mt-10">
-            <h2 className="text-xl font-bold text-zinc-100">{s.h}</h2>
+            <h2 className="font-display text-xl font-bold text-zinc-100">{s.h}</h2>
             {s.body.map((p, i) => (
               <p key={i} className="mt-3 leading-7 text-zinc-400">
                 {p}

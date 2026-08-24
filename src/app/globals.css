@@ -127,3 +127,97 @@ body {
     animation: none;
   }
 }
+
+/* ── VibeCurb pass (2026-08-24): marketing-surface vocabulary ──
+   Custom easings (keyword easings are banned by the design doctrine),
+   entry + scroll-reveal motion, hover physics, and a warm atmosphere
+   layer — scoped by class so the game surfaces stay lean. */
+:root {
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+/* Entry: staggered fade-up-deblur for above-the-fold elements. */
+@keyframes enter-up {
+  from { opacity: 0; transform: translateY(22px); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.enter-up {
+  animation: enter-up 0.7s var(--ease-out-expo) both;
+  animation-delay: var(--stagger, 0ms);
+}
+
+/* Scroll reveal pair — Reveal component adds .is-visible in view. */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hover physics: lift + shadow with intentional easing. */
+.hover-lift {
+  transition: transform 0.35s var(--ease-snap), box-shadow 0.35s var(--ease-snap),
+    border-color 0.3s var(--ease-snap), background-color 0.3s var(--ease-snap);
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(251, 191, 36, 0.12);
+}
+.hover-lift:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 0.1s;
+}
+
+/* Nav links: sliding underline. */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s var(--ease-snap);
+}
+.nav-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Atmosphere: a warm amber breath over the dark ground + felt-not-seen
+   grain. Dark-theme adaptation of the warmth doctrine — the zinc base
+   stays (contrast-verified), the temperature comes from light. */
+.site-atmosphere {
+  background:
+    radial-gradient(ellipse 90% 55% at 22% -8%, rgba(251, 191, 36, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 45% at 85% 8%, rgba(244, 63, 94, 0.04) 0%, transparent 50%);
+}
+.site-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0.022;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-up { animation: none; opacity: 1; transform: none; filter: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .hover-lift, .hover-lift:hover, .hover-lift:active { transform: none; }
+  .nav-underline::after { transition: none; }
+}
