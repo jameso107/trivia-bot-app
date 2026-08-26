@@ -40,6 +40,13 @@ interface AnswerLock {
 
 const storageKey = (code: string) => `tb:player:${code}`;
 
+// 3 -> "3rd" — placement reads like a person says it.
+function ordinal(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
+}
+
 function loadIdentity(code: string): Identity | null {
   try {
     const raw = localStorage.getItem(storageKey(code));
@@ -336,7 +343,8 @@ export function PlayerGame({ code }: { code: string }) {
             </h1>
             {myStanding && (
               <p className="text-lg text-zinc-300" data-testid="my-standing">
-                {myStanding.name}: #{myStanding.rank} · {myStanding.score} pts
+                You&apos;re in <span className="font-black text-amber-300">{ordinal(myStanding.rank)}</span> of{" "}
+                {state.leaderboard.length} · {myStanding.score} pts
               </p>
             )}
             {betweenRounds && phoneCreative && (
@@ -386,7 +394,7 @@ export function PlayerGame({ code }: { code: string }) {
         )}
 
         {state.state === "reveal" && state.reveal && identity && (
-          <RevealCard state={state} identity={identity} />
+          <RevealCard state={state} identity={identity} standing={myStanding} />
         )}
 
         {state.state === "podium" && myStanding && (
@@ -437,7 +445,10 @@ function AnswerForm({
       )}
 
       {question.format === "multiple_choice" && question.options && (
-        <div className="flex flex-col gap-3">
+        /* Kahoot-style 2x2 — the same grid the TV shows, so eyes can jump
+           between screens without re-mapping. An odd last option spans both
+           columns rather than leaving a hole. */
+        <div className="grid grid-cols-2 gap-3">
           {question.options.map((opt, i) => {
             const s = optionStyle(i);
             return (
@@ -446,14 +457,14 @@ function AnswerForm({
                 type="button"
                 data-testid={`option-${i}`}
                 onClick={() => onSubmit({ choice: i, ...wagerPart })}
-                className={`rounded-xl border px-4 py-4 text-left text-lg font-semibold transition-transform active:scale-[0.97] ${s.solid} ${s.text}`}
+                className={`flex min-h-32 flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-center font-semibold transition-transform active:scale-[0.97] [&:last-child:nth-child(odd)]:col-span-2 ${s.solid} ${s.text}`}
               >
                 <span
-                  className={`mr-3 inline-flex h-8 w-8 items-center justify-center rounded-full font-black ${s.chip}`}
+                  className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-black ${s.chip}`}
                 >
                   {String.fromCharCode(65 + i)}
                 </span>
-                {opt}
+                <span className="w-full break-words text-base leading-snug">{opt}</span>
               </button>
             );
           })}
@@ -470,7 +481,7 @@ function AnswerForm({
                 type="button"
                 data-testid={`option-${v}`}
                 onClick={() => onSubmit({ choice: v, ...wagerPart })}
-                className={`rounded-xl border px-4 py-6 text-xl font-black transition-transform active:scale-[0.97] ${s.solid} ${s.text}`}
+                className={`flex min-h-32 items-center justify-center rounded-2xl border px-4 py-6 text-2xl font-black transition-transform active:scale-[0.97] ${s.solid} ${s.text}`}
               >
                 {v ? "True" : "False"}
               </button>
@@ -528,7 +539,15 @@ function AnswerForm({
   );
 }
 
-function RevealCard({ state, identity }: { state: StatePayload; identity: Identity }) {
+function RevealCard({
+  state,
+  identity,
+  standing,
+}: {
+  state: StatePayload;
+  identity: Identity;
+  standing: { rank: number; score: number } | null;
+}) {
   const [challenge, setChallenge] = useState<"idle" | "filing" | "filed" | "failed">("idle");
   const reveal = state.reveal!;
   const mine = reveal.teamResults.find((t) => t.teamId === identity.teamId);
@@ -562,6 +581,15 @@ function RevealCard({ state, identity }: { state: StatePayload; identity: Identi
         {mine?.answered && mine.isCorrect ? "🎉 " : ""}
         {verdict.text}
       </h1>
+      {standing && (
+        <p
+          className="mx-auto rounded-full border border-zinc-800 bg-zinc-900 px-4 py-1.5 text-sm text-zinc-300"
+          data-testid="my-place"
+        >
+          You&apos;re in <span className="font-black text-amber-300">{ordinal(standing.rank)}</span> of{" "}
+          {state.leaderboard.length} · {standing.score} pts
+        </p>
+      )}
       <p className="text-zinc-400">Answer + source on the big screen.</p>
       {/* The one-tap challenge (PRD §4): lands in trivia-qa's dispute queue. */}
       {challenge === "filed" ? (

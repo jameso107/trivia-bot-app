@@ -338,6 +338,18 @@ export function Console({
     }
   }, [state]);
 
+  // Per-QUESTION baseline for the reveal's ranked list: snapshotted during
+  // each reveal, mount-captured by the next RevealPanel — so its arrows mean
+  // "moved on this question", while prevRanks keeps meaning "moved this round".
+  const [questionRanks, setQuestionRanks] = useState<ReadonlyMap<string, number>>(new Map());
+  useEffect(() => {
+    if (state?.state === "reveal") {
+      const snapshot = new Map(state.leaderboard.map((t) => [t.teamId, t.rank]));
+      const id = setTimeout(() => setQuestionRanks(snapshot), 600);
+      return () => clearTimeout(id);
+    }
+  }, [state]);
+
   if (!state) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-zinc-950 text-3xl text-zinc-400">
@@ -512,7 +524,7 @@ export function Console({
         )}
 
         {state.state === "reveal" && state.question && state.reveal && (
-          <RevealPanel key={state.question.id} state={state} streaks={streaks} />
+          <RevealPanel key={state.question.id} state={state} streaks={streaks} prevRanks={questionRanks} />
         )}
 
         {(state.state === "scores" ||
@@ -650,8 +662,19 @@ export function Console({
 // Reveal choreography (PRD §6, fun pass): options hold their colors → the
 // wrong ones drain away and the right one pulses → the room's vote bars grow
 // in (the Kahoot histogram moment) → score deltas stagger in.
-function RevealPanel({ state, streaks }: { state: StatePayload; streaks: ReadonlyMap<string, number> }) {
+function RevealPanel({
+  state,
+  streaks,
+  prevRanks,
+}: {
+  state: StatePayload;
+  streaks: ReadonlyMap<string, number>;
+  prevRanks: ReadonlyMap<string, number>;
+}) {
   const [phase, setPhase] = useState<"dim" | "answer" | "deltas">("dim");
+  // Pre-question ranks, captured once at mount (the parent overwrites its
+  // copy 600ms in — this freeze keeps the arrows honest all reveal long).
+  const [baseline] = useState(() => prevRanks);
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("answer"), 1500);
     const t2 = setTimeout(() => setPhase("deltas"), 3200);
@@ -754,36 +777,46 @@ function RevealPanel({ state, streaks }: { state: StatePayload; streaks: Readonl
         )}
       </div>
 
-      <ul
+      {/* Standings AFTER this question — ranked, with what each team just
+          scored and who moved. The room never has to wait for round-end to
+          know where it stands. */}
+      <ol
         data-testid="reveal-teams"
         className={`w-full max-w-3xl text-4xl transition-opacity duration-700 ${
           phase === "deltas" ? "opacity-100" : "opacity-0"
         }`}
       >
-        {reveal.teamResults.map((t) => (
-          <li key={t.teamId} className="flex justify-between border-b border-zinc-800 py-2">
-            <span>
-              {t.name}
-              {t.answered && t.isCorrect && (streaks.get(t.teamId) ?? 0) >= 2 && (
-                <span className="ml-3 rounded-full bg-orange-500/15 px-3 py-0.5 text-2xl text-orange-400">
-                  🔥 {streaks.get(t.teamId)}
+        {state.leaderboard.map((t) => {
+          const r = reveal.teamResults.find((x) => x.teamId === t.teamId);
+          const prev = baseline.get(t.teamId);
+          const moved = prev === undefined ? 0 : prev - t.rank;
+          return (
+            <li key={t.teamId} className="flex items-center justify-between border-b border-zinc-800 py-2">
+              <span className="flex items-center">
+                <span className="mr-5 w-10 text-right font-black text-amber-400">{t.rank}</span>
+                {t.name}
+                {r?.answered && r.isCorrect && (streaks.get(t.teamId) ?? 0) >= 2 && (
+                  <span className="ml-3 rounded-full bg-orange-500/15 px-3 py-0.5 text-2xl text-orange-400">
+                    🔥 {streaks.get(t.teamId)}
+                  </span>
+                )}
+                {moved > 0 && <span className="ml-3 text-2xl text-emerald-400">▲</span>}
+                {moved < 0 && <span className="ml-3 text-2xl text-rose-400">▼</span>}
+              </span>
+              <span className="flex items-baseline gap-5">
+                <span
+                  className={`text-3xl ${
+                    !r?.answered ? "text-zinc-500" : r.isCorrect ? "text-emerald-400" : "text-red-400"
+                  }`}
+                >
+                  {r?.answered ? `${r.points >= 0 ? "+" : ""}${r.points}` : "—"}
                 </span>
-              )}
-            </span>
-            <span
-              className={
-                !t.answered
-                  ? "text-zinc-400"
-                  : t.isCorrect
-                    ? "text-emerald-400"
-                    : "text-red-400"
-              }
-            >
-              {t.answered ? `${t.points >= 0 ? "+" : ""}${t.points}` : "—"}
-            </span>
-          </li>
-        ))}
-      </ul>
+                <span className="w-28 text-right font-bold">{t.score}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
