@@ -35,8 +35,6 @@ test("3G join budget: QR scan → answering in under 10 seconds", async ({ brows
   await page.goto(`/j/${night.joinCode}`);
   await expect(page.getByTestId("join-form")).toBeVisible({ timeout: 25000 });
   await page.locator('input[name="displayName"]').fill("Throttled Tim");
-  await page.locator('select[name="team"]').selectOption("__new__");
-  await page.locator('input[name="teamName"]').fill("Buffering");
   await page.getByRole("button", { name: /let's play/i }).click();
   await expect(page.getByTestId("answer-form")).toBeVisible({ timeout: 25000 });
   await page.getByTestId("option-1").click();

@@ -8,7 +8,7 @@ export function SiteNav() {
   return (
     <nav className={`sticky top-0 z-50 border-b border-white/5 bg-zinc-950/70 backdrop-blur-xl ${displayFont.variable}`}>
       {/* Scroll reveals are progressive enhancement: without JS the content
-          must simply be there — never a page of invisible sections. */}
+          must simply be there, never a page of invisible sections. */}
       <noscript>
         <style>{`.reveal{opacity:1 !important;transform:none !important}.enter-up{animation:none !important;opacity:1 !important;filter:none !important}`}</style>
       </noscript>

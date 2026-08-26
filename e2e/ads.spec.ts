@@ -6,7 +6,7 @@ import { adminClient } from "./helpers/admin";
 import { seedSyntheticNight } from "./helpers/fixtures";
 import { hostAccessToken, loginAsHost } from "./helpers/auth";
 import { advanceUntil } from "./helpers/drive";
-import { joinNewTeam, newPlayer } from "./helpers/players";
+import { join, newPlayer } from "./helpers/players";
 
 test("ad slots: sponsor screen creative, house phone card, impressions, venue health", async ({
   browser,
@@ -41,7 +41,7 @@ test("ad slots: sponsor screen creative, house phone card, impressions, venue he
   await expect(hostPage.getByTestId("join-code")).toBeVisible({ timeout: 15000 });
 
   const p1 = await newPlayer(browser, night.joinCode);
-  await joinNewTeam(p1, "Watcher", "Ad Audience");
+  await join(p1, "Watcher");
 
   // Round 1 (2 questions) → scores → intermission, driven over the API.
   await advanceUntil(night.gameId, token, "intermission");

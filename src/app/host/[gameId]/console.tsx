@@ -1,22 +1,16 @@
 "use client";
 
 // The TV. M3: it runs itself — every state carries a dwell and advances on
-// its own (the auto-host), each beat gets a personality line from host_lines,
-// reveals play out in stages (dim → answer + source → score deltas), and a
-// bartender can still take the wheel: space advances, p pauses the engine
-// (PRD §6 manual override). Renders exclusively from StatePayload broadcasts;
-// the server validates every transition regardless of who asked.
+// its own (the self-healing auto-host), reveals play out in stages
+// (dim → answer + source → standings), and a bartender can still take the
+// wheel: space advances, p pauses the engine (PRD §6 manual override).
+// Renders exclusively from StatePayload broadcasts; the server validates
+// every transition regardless of who asked. Host quips retired 2026-08-26
+// (owner call), and teams are an engine detail: players fly solo.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { advanceGame, FnError, getGameState } from "@/lib/game/api";
 import { useGameChannel } from "@/lib/game/use-game-channel";
-import {
-  loadLinePicker,
-  ttsUrl,
-  type HostLine,
-  type HostSlot,
-  type LinePicker,
-} from "@/lib/game/host-lines";
 import { useCreative, useImpression } from "@/lib/game/use-creative";
 import { music } from "@/lib/game/music";
 import { FALSE_STYLE, optionStyle, ROUND_WASH, TRUE_STYLE } from "@/lib/game/palette";
@@ -52,35 +46,6 @@ const AUTO_DWELL_MS: Partial<Record<GameStateName, number>> = {
   podium: 45_000,
 };
 
-function slotForState(s: StatePayload): HostSlot | null {
-  switch (s.state) {
-    case "lobby":
-      return "lobby";
-    case "round_intro":
-      return "round_intro";
-    case "locked":
-      return "pre_reveal";
-    case "reveal": {
-      const answered = s.reveal?.teamResults.filter((t) => t.answered) ?? [];
-      const correct = answered.filter((t) => t.isCorrect).length;
-      // Mostly right → celebrate; mostly wrong (or silent) → tease the question.
-      return answered.length > 0 && correct * 2 >= answered.length
-        ? "post_reveal_correct"
-        : "post_reveal_brutal";
-    }
-    case "intermission":
-      return "intermission";
-    case "final_question":
-      return "final_intro";
-    case "podium":
-      return "podium";
-    case "ended":
-      return "close";
-    default:
-      return null; // question: the question IS the content
-  }
-}
-
 export function Console({
   gameId,
   joinUrl,
@@ -95,41 +60,12 @@ export function Console({
   const [lastJoined, setLastJoined] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paused, setPaused] = useState(false);
-  const [hostLine, setHostLine] = useState<HostLine | null>(null);
   const advancing = useRef(false);
-  const pickerRef = useRef<LinePicker | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const lastBeatRef = useRef<string>("");
-
-  useEffect(() => {
-    let disposed = false;
-    loadLinePicker().then((picker) => {
-      if (!disposed) pickerRef.current = picker;
-    });
-    return () => {
-      disposed = true;
-    };
-  }, []);
 
   const onState = useCallback((s: StatePayload) => {
     setState(s);
     setTick(null);
     setError(null);
-
-    // One personality beat per transition (resyncs must not re-roll lines).
-    const beat = `${s.state}:${s.round}:${s.position}`;
-    if (beat !== lastBeatRef.current) {
-      lastBeatRef.current = beat;
-      const slot = slotForState(s);
-      const line = slot ? (pickerRef.current?.(slot) ?? null) : null;
-      setHostLine(line);
-      // TTS path (feature-flagged; audio must never block a transition —
-      // failures are silent by design, PRD §6).
-      if (line?.tts_audio_path && s.settings.tts_enabled && audioRef.current) {
-        audioRef.current.src = ttsUrl(line.tts_audio_path);
-        void audioRef.current.play().catch(() => {});
-      }
-    }
   }, []);
   const onLobby = useCallback((e: LobbyEvent) => {
     setLastJoined(e.lastJoined);
@@ -220,17 +156,31 @@ export function Console({
     `intermission:${state?.round ?? 0}`,
   );
 
-  // The auto-host: each beat advances itself after its dwell.
+  // The auto-host, self-healing (owner bug report 2026-08-26: nights stuck on
+  // round pages). A one-shot timer dies if its advance() gets swallowed (auth
+  // token mid-refresh, a resync that fails, the in-flight guard) — so instead
+  // an interval keeps checking "same beat, dwell elapsed?" and RETRIES until
+  // the beat actually changes. A failed attempt costs one tick, never the night.
   const autoHost = state ? state.settings.auto_host !== false : true;
+  const beatKey = state ? `${state.state}:${state.round}:${state.position}` : "";
+  // 0 until the first effect run — declared before the interval effect so the
+  // stamp always lands first (React runs same-commit effects in order).
+  const beatStartRef = useRef(0);
+  useEffect(() => {
+    beatStartRef.current = Date.now();
+  }, [beatKey]);
   useEffect(() => {
     if (!state || !autoHost || paused) return;
     const dwell = AUTO_DWELL_MS[state.state];
     if (!dwell) return;
-    const id = setTimeout(() => void advance(), dwell);
-    return () => clearTimeout(id);
+    const id = setInterval(() => {
+      if (advancing.current) return;
+      if (Date.now() - beatStartRef.current >= dwell) void advance();
+    }, 750);
+    return () => clearInterval(id);
   }, [state, autoHost, paused, advance]);
 
-  // Every team is in? Don't make the room stare at a countdown — hold one
+  // Everyone is in? Don't make the room stare at a countdown — hold one
   // beat (the last lock-in deserves its moment) and cut to the lock.
   useEffect(() => {
     if (!state || !autoHost || paused || !tick) return;
@@ -360,9 +310,6 @@ export function Console({
 
   return (
     <main className="flex min-h-screen flex-col bg-zinc-950 px-16 py-10 text-zinc-50">
-      {/* Hidden audio element: the TTS playback path (silent no-op without files) */}
-      <audio ref={audioRef} className="hidden" />
-
       <header className="flex items-center justify-between text-2xl text-zinc-400">
         <span className="font-semibold uppercase tracking-widest text-amber-400">
           {state.packTitle || "TRIVIUM"}
@@ -384,7 +331,7 @@ export function Console({
                   : "border-zinc-700 text-zinc-400"
             }`}
           >
-            {!autoHost ? "manual" : paused ? "paused — p resumes" : "auto-host"}
+            {!autoHost ? "manual" : paused ? "paused, p resumes" : "auto-host"}
           </span>
           <span data-testid="console-state" data-state={state.state}>
             {state.state !== "lobby" && state.round >= 1 && state.round <= state.rounds
@@ -398,7 +345,7 @@ export function Console({
       <section className="flex flex-1 flex-col items-center justify-center gap-10 text-center">
         {state.state === "lobby" && (
           <div className="flex flex-col items-center gap-8">
-            <h1 className="text-6xl font-black">Grab your phones — trivia is starting</h1>
+            <h1 className="text-6xl font-black">Grab your phones, trivia is starting</h1>
             <div className="flex items-center gap-16">
               <div
                 className="h-[400px] w-[400px] overflow-hidden rounded-2xl"
@@ -415,7 +362,7 @@ export function Console({
                 </p>
                 <p className="text-4xl text-zinc-300" data-testid="player-count">
                   {state.playerCount} player{state.playerCount === 1 ? "" : "s"} in
-                  {lastJoined ? ` — welcome, ${lastJoined}!` : ""}
+                  {lastJoined ? ` · welcome, ${lastJoined}!` : ""}
                 </p>
               </div>
             </div>
@@ -441,7 +388,7 @@ export function Console({
             <div className="flex w-full max-w-6xl animate-beat-in flex-col items-center gap-10">
               {state.question.isFinal && (
                 <p className="text-3xl font-bold uppercase tracking-widest text-amber-400">
-                  Final question — wager 0–100 on your phone
+                  Final question: wager 0-100 on your phone
                 </p>
               )}
               <h1 className="text-[64px] font-bold leading-tight" data-testid="question-prompt">
@@ -450,7 +397,7 @@ export function Console({
               {preroll > 0 && (
                 <div className="flex flex-col items-center gap-4" data-testid="preroll">
                   <p className="text-3xl uppercase tracking-widest text-zinc-400">
-                    Read it — answers open in
+                    Read it, answers open in
                   </p>
                   <p
                     key={preroll}
@@ -508,7 +455,7 @@ export function Console({
                 ) : null}
                 <span data-testid="answered-tick">
                   {tick?.questionId === state.question.id ? tick.answeredTeams : 0}/
-                  {state.teams.length} teams in
+                  {state.teams.length} players in
                 </span>
               </div>
             </div>
@@ -533,7 +480,7 @@ export function Console({
           <div className="relative flex w-full max-w-4xl animate-beat-in flex-col items-center gap-8">
             {state.state === "podium" && <Confetti />}
             <h1 className={`font-black ${state.state === "podium" ? "animate-pop-in text-7xl" : "text-6xl"}`}>
-              {state.state === "podium" ? "🏆 Final standings" : `Scores — round ${state.round}`}
+              {state.state === "podium" ? "🏆 Final standings" : `Scores after round ${state.round}`}
             </h1>
             {state.state === "intermission" && sponsorSlot && creative && (
               <aside
@@ -592,19 +539,10 @@ export function Console({
 
         {state.state === "ended" && (
           <h1 className="animate-beat-in text-6xl font-black" data-testid="ended-screen">
-            That&apos;s the night — thanks for playing!
+            That&apos;s the night, thanks for playing!
           </h1>
         )}
       </section>
-
-      {hostLine && (
-        <p
-          data-testid="host-line"
-          className="animate-beat-in mx-auto max-w-5xl pb-4 text-center text-3xl italic text-amber-200/90"
-        >
-          {hostLine.text}
-        </p>
-      )}
 
       {error && (
         <p
@@ -612,7 +550,7 @@ export function Console({
           data-testid="console-error"
           className="mx-auto rounded-lg border border-red-900 bg-red-950 px-4 py-2 text-xl text-red-300"
         >
-          {error} — resynced; try again or check the wifi.
+          {error}. Resynced, try again or check the wifi.
         </p>
       )}
 
@@ -809,7 +747,7 @@ function RevealPanel({
                     !r?.answered ? "text-zinc-500" : r.isCorrect ? "text-emerald-400" : "text-red-400"
                   }`}
                 >
-                  {r?.answered ? `${r.points >= 0 ? "+" : ""}${r.points}` : "—"}
+                  {r?.answered ? `${r.points >= 0 ? "+" : ""}${r.points}` : ", "}
                 </span>
                 <span className="w-28 text-right font-bold">{t.score}</span>
               </span>

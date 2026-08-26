@@ -3,7 +3,7 @@
 import { SiteFooter, SiteNav } from "../site-chrome";
 import { displayFont } from "../fonts";
 
-export const metadata = { title: "Privacy — TRIVIUM" };
+export const metadata = { title: "Privacy, TRIVIUM" };
 
 const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
@@ -15,7 +15,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: "What we collect",
     body: [
-      "Players: a display name you type at the table, your answers and scores, and — only if you choose to save your night — an email address. Playing never requires an account.",
+      "Players: a display name you type at the table, your answers and scores, and, only if you choose to save your night, an email address. Playing never requires an account.",
       "Venues: contact details, venue name and address, and account email.",
       "Everyone: basic usage analytics (game events, timings, aggregate counts) and the technical minimum for sessions to work (a device key stored on your phone for rejoining a game).",
       "We do not knowingly collect personal data from children under 13.",
@@ -33,7 +33,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: "What we never do",
     body: [
-      "We don't sell personal data. We don't share player identities with sponsors — sponsors see aggregate delivery numbers only. We don't spam players: saving your stats opts you into your own history, not a mailing list.",
+      "We don't sell personal data. We don't share player identities with sponsors, sponsors see aggregate delivery numbers only. We don't spam players: saving your stats opts you into your own history, not a mailing list.",
     ],
   },
   {

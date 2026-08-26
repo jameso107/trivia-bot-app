@@ -145,7 +145,7 @@ export function PackBuilder({ packId }: { packId: string | null }) {
         </p>
         <p className="mt-1 text-sm text-zinc-400">
           {status === "live"
-            ? "It's in your pack library, ready to start tonight. Published packs can't be edited — retire it from the dashboard if it's done."
+            ? "It's in your pack library, ready to start tonight. Published packs can't be edited, retire it from the dashboard if it's done."
             : "Retired packs stay in your history but can't start new games."}
         </p>
       </section>

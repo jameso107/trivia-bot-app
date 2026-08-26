@@ -1,7 +1,8 @@
 // API-level guarantees of the answers gate (PRD §3/§5): client-uuid retries
-// are idempotent, a second teammate hits team-lock, late answers bounce off
-// the server clock. No browser — this drives the same client module the app
-// uses, straight at the edge functions.
+// are idempotent, a second submission after the lock bounces (solo play: your
+// own team-of-one is the team that locks), late answers bounce off the server
+// clock. No browser — this drives the same client module the app uses,
+// straight at the edge functions.
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { adminClient } from "./helpers/admin";
@@ -15,21 +16,12 @@ import {
   submitAnswer,
 } from "../src/lib/game/api";
 
-test("answers are idempotent, team-locked, and deadline-enforced", async () => {
+test("answers are idempotent, locked after first submit, and deadline-enforced", async () => {
   test.setTimeout(120_000);
   const night = await seedSyntheticNight();
   const token = await hostAccessToken(night.hostEmail);
 
-  const alice = await joinGame({
-    code: night.joinCode,
-    displayName: "Alice",
-    teamName: "API Raiders",
-  });
-  const bob = await joinGame({
-    code: night.joinCode,
-    displayName: "Bob",
-    teamId: alice.teamId,
-  });
+  const alice = await joinGame({ code: night.joinCode, displayName: "Alice" });
 
   // Rejoining with device credentials restores the same player.
   const aliceAgain = await joinGame({
@@ -73,14 +65,15 @@ test("answers are idempotent, team-locked, and deadline-enforced", async () => {
   expect(retry.accepted).toBe(true);
   expect(retry.duplicate).toBe(true);
 
-  // A teammate's separate attempt hits the team lock (first answer locks).
+  // A NEW submission (fresh uuid, different payload) after the lock bounces:
+  // with edits off, the first answer is final — even for its own author.
   await expect(
     submitAnswer({
       answerId: randomUUID(),
       gameId: night.gameId,
       questionId: q1.id,
-      playerId: bob.playerId,
-      deviceKey: bob.deviceKey,
+      playerId: alice.playerId,
+      deviceKey: alice.deviceKey,
       payload: { choice: 0 },
     }),
   ).rejects.toMatchObject({ reason: "team_locked" });
@@ -138,7 +131,7 @@ test("live-pack hard rule: non-live packs are unreachable pre-start", async () =
 
   // Players can't find it, the console can't read it, the night can't start.
   await expect(
-    joinGame({ code: night.joinCode, displayName: "Eve", teamName: "Gatecrash" }),
+    joinGame({ code: night.joinCode, displayName: "Eve" }),
   ).rejects.toMatchObject({ status: 404 });
   await expect(getGameState({ code: night.joinCode })).rejects.toMatchObject({
     status: 404,
@@ -187,7 +180,7 @@ test("abandoned sweep: idle games flip to abandoned and emit game_abandoned", as
   });
 });
 
-test("team edits: identical retries are free, edits cap at 3, timestamps move only on real edits", async () => {
+test("answer edits: identical retries are free, edits cap at 3, timestamps move only on real edits", async () => {
   test.setTimeout(120_000);
   const night = await seedSyntheticNight();
   const admin = adminClient();
@@ -197,11 +190,7 @@ test("team edits: identical retries are free, edits cap at 3, timestamps move on
     .eq("id", night.gameId);
   const token = await hostAccessToken(night.hostEmail);
 
-  const alice = await joinGame({
-    code: night.joinCode,
-    displayName: "Edit Alice",
-    teamName: "The Editors",
-  });
+  const alice = await joinGame({ code: night.joinCode, displayName: "Edit Alice" });
 
   await advanceGame({ gameId: night.gameId, expectedState: "lobby", accessToken: token });
   await advanceGame({ gameId: night.gameId, expectedState: "round_intro", accessToken: token });

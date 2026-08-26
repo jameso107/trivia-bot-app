@@ -17,7 +17,7 @@ export default function GlobalError({
       <body className="flex min-h-screen flex-col items-center justify-center gap-4 bg-zinc-950 text-zinc-50">
         <h1 className="text-3xl font-bold">Something broke.</h1>
         <p className="text-zinc-400">
-          Not your fault. Refresh the page — the game state is safe on the
+          Not your fault. Refresh the page, the game state is safe on the
           server.
         </p>
       </body>

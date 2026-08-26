@@ -3,7 +3,7 @@
 import { SiteFooter, SiteNav } from "../site-chrome";
 import { displayFont } from "../fonts";
 
-export const metadata = { title: "Terms — TRIVIUM" };
+export const metadata = { title: "Terms, TRIVIUM" };
 
 const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
@@ -22,9 +22,9 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: "Venue responsibilities",
     body: [
-      "Run a safe event and comply with local laws — including any rules about promotions and prizes; TRIVIUM ships with no cash-prize mechanics, and venues that offer prizes do so on their own terms and responsibility.",
+      "Run a safe event and comply with local laws, including any rules about promotions and prizes; TRIVIUM ships with no cash-prize mechanics, and venues that offer prizes do so on their own terms and responsibility.",
       "Venue-authored questions must not be unlawful, hateful, or infringe someone else's rights. We can remove content that breaks this.",
-      "Report content errors — the dispute button exists for a reason; upheld disputes are tracked in our public error rate.",
+      "Report content errors, the dispute button exists for a reason; upheld disputes are tracked in our public error rate.",
     ],
   },
   {

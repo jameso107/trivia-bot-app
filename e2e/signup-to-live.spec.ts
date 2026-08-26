@@ -1,7 +1,7 @@
 // M5 gate (PRD §7): a brand-new venue goes signup → first live game in under
 // 10 minutes without help — wizard (which wakes the org daemon via the §9
 // events row), settings, custom pack request, feedback, promo kit, the /v/
-// flyer redirect, and a player filing a one-tap dispute.
+// flyer redirect, and a player joining off the flyer path (solo play).
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { adminClient } from "./helpers/admin";
@@ -33,8 +33,8 @@ test("signup → first live game, with every M5 surface exercised", async ({ pag
   await page.getByRole("button", { name: /create my venue/i }).click();
   await expect(page.getByTestId("venue-name")).toHaveText(venueName, { timeout: 20000 });
 
-  // ---- 3. settings: flip team edits on, save ----
-  await page.locator('input[name="team_edits"]').check();
+  // ---- 3. settings: flip the soundtrack on, save ----
+  await page.locator('input[name="music_enabled"]').check();
   await page.getByRole("button", { name: /save defaults/i }).click();
   await expect(page.getByTestId("notice")).toContainText("Settings saved", {
     timeout: 15000,
@@ -79,10 +79,8 @@ test("signup → first live game, with every M5 surface exercised", async ({ pag
   await p2.waitForURL(/\/j\//, { timeout: 20000 }); // flyer QR → live game
   await expect(p2.getByTestId("join-form")).toBeVisible({ timeout: 15000 });
 
-  // ---- 8. a player joins off the flyer path and files a one-tap dispute ----
+  // ---- 8. a player joins off the flyer path and sees the night through ----
   await p2.locator('input[name="displayName"]').fill("Skeptic");
-  await p2.locator('select[name="team"]').selectOption("__new__");
-  await p2.locator('input[name="teamName"]').fill("Well Actually");
   await p2.getByRole("button", { name: /let's play/i }).click();
   await expect(p2.getByTestId("player-screen")).toBeVisible({ timeout: 15000 });
 
@@ -92,8 +90,7 @@ test("signup → first live game, with every M5 surface exercised", async ({ pag
   await advanceGame({ gameId, expectedState: "question", accessToken: token });
   await advanceGame({ gameId, expectedState: "locked", accessToken: token });
   await expect(p2.getByTestId("reveal-card")).toBeVisible({ timeout: 15000 });
-  await p2.getByTestId("challenge-button").click();
-  await expect(p2.getByTestId("challenge-filed")).toBeVisible({ timeout: 15000 });
+  await expect(p2.getByTestId("my-place")).toBeVisible(); // placement chip between questions
 
   // ---- 9. DB audit: the org wake-up + every frozen event fired ----
   const admin = adminClient();
@@ -116,14 +113,7 @@ test("signup → first live game, with every M5 surface exercised", async ({ pag
     .select("settings")
     .eq("id", gameId)
     .single();
-  expect((game!.settings as Record<string, unknown>).team_edits).toBe(true); // defaults rode in
-
-  const { data: dispute } = await admin
-    .from("question_disputes")
-    .select("id, status")
-    .eq("game_id", gameId);
-  expect(dispute).toHaveLength(1);
-  expect(dispute![0].status).toBe("open");
+  expect((game!.settings as Record<string, unknown>).music_enabled).toBe(true); // defaults rode in
 
   const { data: events } = await admin
     .from("analytics_events")
@@ -135,5 +125,4 @@ test("signup → first live game, with every M5 surface exercised", async ({ pag
   expect(count("feedback_submitted")).toBe(1);
   expect(count("promo_kit_downloaded")).toBeGreaterThanOrEqual(1);
   expect(count("game_created")).toBe(1);
-  expect(count("challenge_filed")).toBe(1);
 });

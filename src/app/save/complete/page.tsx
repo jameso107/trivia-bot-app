@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { completeSave, FnError } from "@/lib/game/api";
 
-export const metadata = { title: "Stats saved — TRIVIUM" };
+export const metadata = { title: "Stats saved · TRIVIUM" };
 
 // Where the save-moment magic link lands: the user is freshly verified, the
 // query carries the anonymous night to claim. complete-save is idempotent, so
@@ -47,7 +47,7 @@ export default async function SaveCompletePage({
       {outcome.ok ? (
         <>
           <h1 className="text-3xl font-black text-emerald-400" data-testid="save-complete">
-            {outcome.newAccount ? "Account created — night saved!" : "Night saved!"}
+            {outcome.newAccount ? "Account created and night saved!" : "Night saved!"}
           </h1>
           <p className="text-zinc-400">
             Tonight&apos;s result is on your record. Play anywhere TRIVIUM runs and it all

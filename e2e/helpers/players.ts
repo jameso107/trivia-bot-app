@@ -10,20 +10,10 @@ export async function newPlayer(browser: Browser, code: string): Promise<Page> {
   return page;
 }
 
-export async function joinNewTeam(page: Page, name: string, team: string) {
+// Solo play (2026-08-26): a name is all it takes — the server mints a
+// single-member team behind the scenes.
+export async function join(page: Page, name: string) {
   await page.locator('input[name="displayName"]').fill(name);
-  await page.locator('select[name="team"]').selectOption("__new__");
-  await page.locator('input[name="teamName"]').fill(team);
-  await page.getByRole("button", { name: /let's play/i }).click();
-  await expect(page.getByTestId("player-screen")).toBeVisible({ timeout: 15000 });
-}
-
-export async function joinExistingTeam(page: Page, name: string, team: string) {
-  const option = page.locator('select[name="team"] option', { hasText: team });
-  await expect(option).toHaveCount(1, { timeout: 15000 });
-  const value = await option.getAttribute("value");
-  await page.locator('input[name="displayName"]').fill(name);
-  await page.locator('select[name="team"]').selectOption(value!);
   await page.getByRole("button", { name: /let's play/i }).click();
   await expect(page.getByTestId("player-screen")).toBeVisible({ timeout: 15000 });
 }

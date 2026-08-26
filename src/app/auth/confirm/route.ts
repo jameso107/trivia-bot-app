@@ -33,6 +33,6 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.redirect(
-    new URL("/login?error=That%20link%20expired%20or%20was%20already%20used%20—%20request%20a%20new%20one", request.url),
+    new URL("/login?error=That%20link%20expired%20or%20was%20already%20used%20, %20request%20a%20new%20one", request.url),
   );
 }

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FnError, meStats } from "@/lib/game/api";
 
-export const metadata = { title: "My nights — TRIVIUM" };
+export const metadata = { title: "My nights · TRIVIUM" };
 
 // Minimal /me (PRD §10 M4): the account has to be WORTH creating — your
 // nights, your numbers. Streaks and leagues are post-MVP by decision.
@@ -22,7 +22,7 @@ export default async function MePage() {
         <main className="mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center gap-4 px-5 text-center">
           <h1 className="text-2xl font-bold">No nights saved yet</h1>
           <p className="text-zinc-400">
-            Play a game and hit &quot;Save my stats&quot; when the night ends — it all
+            Play a game and hit &quot;Save my stats&quot; when the night ends. It all
             starts counting from there.
           </p>
         </main>

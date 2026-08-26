@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TRIVIUM — free bar trivia that runs itself",
+  title: "TRIVIUM · free bar trivia that runs itself",
   description:
     "Run a full trivia night from any computer plugged into a TV. Players join by QR in seconds. Free for bars, no host needed.",
 };

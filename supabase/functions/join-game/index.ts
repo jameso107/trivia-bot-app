@@ -1,6 +1,8 @@
-// Join a game by code: create-or-pick a team, register the player, hand back
-// the anonymous device credentials + a full state projection (one round trip —
-// the join path owns the <10s budget, PRD §3/§7).
+// Join a game by code (solo play, owner decision 2026-08-26): every player
+// gets their own single-member team named after them — the team-based engine
+// (scoring, locks, leaderboard) runs unchanged with no team UI anywhere.
+// Hands back anonymous device credentials + a full state projection in one
+// round trip (the join path owns the <10s budget, PRD §3/§7).
 import {
   broadcast,
   buildProjection,
@@ -91,43 +93,24 @@ async function handle(req: Request): Promise<Response> {
   const displayName = cleanName(body.displayName);
   if (!displayName) return jsonError("pick a different name", 422);
 
-  // Resolve the team: an existing id, or find-or-create by name.
+  // Solo team-of-one, named after the player (suffixed on a name clash so
+  // two Mikes both get in). Legacy teamId/teamName fields are ignored.
   let teamId: string | null = null;
-  let teamCreated = false;
-  if (typeof body.teamId === "string" && body.teamId) {
-    const { data: team } = await db
-      .from("game_teams")
-      .select("id")
-      .eq("id", body.teamId)
-      .eq("game_id", game.id)
-      .maybeSingle();
-    if (!team) return jsonError("team not found", 404);
-    teamId = team.id as string;
-  } else {
-    const teamName = cleanName(body.teamName);
-    if (!teamName) return jsonError("pick a different team name", 422);
+  for (let attempt = 0; attempt < 8 && !teamId; attempt++) {
+    const name = attempt === 0 ? displayName : `${displayName} ${attempt + 1}`;
     const { data: inserted, error: insErr } = await db
       .from("game_teams")
-      .insert({ game_id: game.id, name: teamName })
+      .insert({ game_id: game.id, name })
       .select("id")
       .maybeSingle();
     if (inserted) {
       teamId = inserted.id as string;
-      teamCreated = true;
-    } else if (insErr?.code === "23505") {
-      // Two phones created the same team at once — join the existing one.
-      const { data: existing } = await db
-        .from("game_teams")
-        .select("id")
-        .eq("game_id", game.id)
-        .eq("name", teamName)
-        .maybeSingle();
-      if (!existing) return jsonError("could not create team — try again", 500);
-      teamId = existing.id as string;
-    } else {
-      return jsonError(insErr?.message ?? "could not create team", 500);
+    } else if (insErr?.code !== "23505") {
+      return jsonError(insErr?.message ?? "could not join", 500);
     }
   }
+  if (!teamId) return jsonError("pick a different name", 422);
+  const teamCreated = true;
 
   const deviceKey = crypto.randomUUID();
   const { data: player, error: playerErr } = await db

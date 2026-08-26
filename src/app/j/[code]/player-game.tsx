@@ -12,7 +12,6 @@ import {
   type JoinResult,
 } from "@/lib/game/api";
 import { useGameChannel } from "@/lib/game/use-game-channel";
-import { createClient } from "@/lib/supabase/client";
 import { useCreative, useImpression } from "@/lib/game/use-creative";
 import { FALSE_STYLE, optionStyle, TRUE_STYLE } from "@/lib/game/palette";
 import { usePreroll } from "@/lib/game/use-preroll";
@@ -20,7 +19,6 @@ import { SaveMoment } from "./save-moment";
 import type {
   LobbyEvent,
   StatePayload,
-  TeamSummary,
 } from "../../../../supabase/functions/_shared/protocol.ts";
 
 interface Identity {
@@ -71,7 +69,6 @@ export function PlayerGame({ code }: { code: string }) {
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [bootGameId, setBootGameId] = useState<string | null>(null);
   const [state, setState] = useState<StatePayload | null>(null);
-  const [formTeams, setFormTeams] = useState<TeamSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"boot" | "form" | "joining" | "in">("boot");
   const [lock, setLock] = useState<AnswerLock | null>(null);
@@ -88,7 +85,6 @@ export function PlayerGame({ code }: { code: string }) {
     storeIdentity(code, id);
     setIdentity(id);
     setState(res.state);
-    setFormTeams(res.state.teams);
     setPhase("in");
   }
 
@@ -100,14 +96,13 @@ export function PlayerGame({ code }: { code: string }) {
         .then((s) => {
           setState(s);
           setBootGameId(s.gameId);
-          setFormTeams(s.teams);
           setPhase("form");
         })
         .catch((e) => {
           setError(
             e instanceof FnError && e.status === 404
               ? "No game with that code."
-              : "Couldn't reach the game — try again.",
+              : "Couldn't reach the game, try again.",
           );
           setPhase("form");
         });
@@ -127,7 +122,6 @@ export function PlayerGame({ code }: { code: string }) {
           .then((s) => {
             setState(s);
             setBootGameId(s.gameId);
-            setFormTeams(s.teams);
           })
           .catch(() => {});
         setPhase("form");
@@ -137,14 +131,12 @@ export function PlayerGame({ code }: { code: string }) {
 
   const onState = useCallback((s: StatePayload) => {
     setState(s);
-    setFormTeams(s.teams);
     // A lock only applies to the question it was placed on.
     setLock((prev) =>
       prev && s.question && prev.questionId === s.question.id ? prev : null,
     );
   }, []);
   const onLobby = useCallback((e: LobbyEvent) => {
-    setFormTeams(e.teams);
     setState((prev) =>
       prev ? { ...prev, playerCount: e.playerCount, teams: e.teams } : prev,
     );
@@ -168,17 +160,11 @@ export function PlayerGame({ code }: { code: string }) {
     setError(null);
     setPhase("joining");
     const displayName = String(formData.get("displayName") ?? "");
-    const teamChoice = String(formData.get("team") ?? "__new__");
-    const teamName = String(formData.get("teamName") ?? "");
     try {
-      const res = await joinGame({
-        code,
-        displayName,
-        ...(teamChoice === "__new__" ? { teamName } : { teamId: teamChoice }),
-      });
+      const res = await joinGame({ code, displayName });
       applyJoin(res);
     } catch (e) {
-      setError(e instanceof FnError ? e.message : "Couldn't join — try again.");
+      setError(e instanceof FnError ? e.message : "Couldn't join, try again.");
       setPhase("form");
     }
   }
@@ -204,7 +190,7 @@ export function PlayerGame({ code }: { code: string }) {
         setLock({ questionId: question.id, by: "time" });
       } else {
         setLock(null);
-        setError("That didn't go through — tap again.");
+        setError("That didn't go through, tap again.");
       }
     } finally {
       sendingRef.current = false;
@@ -246,30 +232,6 @@ export function PlayerGame({ code }: { code: string }) {
               className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-3 text-lg"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-300">
-            Team
-            <select
-              name="team"
-              defaultValue="__new__"
-              className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-3 text-lg"
-            >
-              <option value="__new__">Start a new team…</option>
-              {formTeams.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.playerCount})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-300">
-            New team name (if starting one)
-            <input
-              name="teamName"
-              maxLength={24}
-              autoComplete="off"
-              className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-3 text-lg"
-            />
-          </label>
           {error && (
             <p role="alert" className="text-sm text-red-400">
               {error}
@@ -299,8 +261,8 @@ export function PlayerGame({ code }: { code: string }) {
   const activeLock = q && lock && lock.questionId === q.id ? lock : null;
 
   const lockCopy: Record<AnswerLock["by"], { title: string; body: string }> = {
-    me: { title: "Locked in", body: "Answer is in — eyes on the screen." },
-    teammate: { title: "Locked in", body: "A teammate answered for your team." },
+    me: { title: "Locked in", body: "Answer is in. Eyes on the screen." },
+    teammate: { title: "Locked in", body: "Your answer is already in." },
     time: { title: "Time!", body: "Answers are locked for this one." },
   };
 
@@ -313,9 +275,6 @@ export function PlayerGame({ code }: { code: string }) {
       >
         <header className="flex items-center justify-between text-sm text-zinc-400">
           <span>{identity?.displayName}</span>
-          <span data-testid="player-team">
-            {state.teams.find((t) => t.id === identity?.teamId)?.name}
-          </span>
         </header>
 
         {error && (
@@ -327,9 +286,9 @@ export function PlayerGame({ code }: { code: string }) {
         {state.state === "lobby" && (
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-bold">You&apos;re in!</h1>
-            <p className="text-zinc-400">Watch the big screen — the night starts soon.</p>
+            <p className="text-zinc-400">Watch the big screen. The night starts soon.</p>
             <p className="text-sm text-zinc-400" data-testid="lobby-count">
-              {state.playerCount} players · {state.teams.length} teams
+              {state.playerCount} player{state.playerCount === 1 ? "" : "s"} in
             </p>
           </div>
         )}
@@ -366,7 +325,7 @@ export function PlayerGame({ code }: { code: string }) {
           <div className="flex flex-col gap-3 text-center" data-testid="player-preroll">
             <h1 className="text-xl font-bold leading-snug">{q.prompt}</h1>
             <p className="text-sm uppercase tracking-widest text-zinc-400">
-              read it — answers open in
+              read it, answers open in
             </p>
             <p key={preroll} className="animate-pop-in text-6xl font-black text-amber-400">
               {preroll}
@@ -404,7 +363,7 @@ export function PlayerGame({ code }: { code: string }) {
               {myStanding.rank === 1 ? "🏆 Champions!" : `#${myStanding.rank}`}
             </h1>
             <p className="text-lg text-zinc-300">
-              {myStanding.name} — {myStanding.score} pts
+              {myStanding.name}, {myStanding.score} pts
             </p>
           </div>
         )}
@@ -431,7 +390,7 @@ function AnswerForm({
 
       {question.isFinal && (
         <label className="flex flex-col gap-1 text-sm text-zinc-300">
-          Wager (0–100, up to what your team has)
+          Wager (0-100, up to what you have)
           <input
             type="number"
             min={0}
@@ -548,27 +507,13 @@ function RevealCard({
   identity: Identity;
   standing: { rank: number; score: number } | null;
 }) {
-  const [challenge, setChallenge] = useState<"idle" | "filing" | "filed" | "failed">("idle");
   const reveal = state.reveal!;
   const mine = reveal.teamResults.find((t) => t.teamId === identity.teamId);
   const verdict = !mine?.answered
     ? { text: "No answer this time", cls: "text-zinc-400" }
     : mine.isCorrect
       ? { text: `Correct! +${mine.points}`, cls: "text-emerald-400" }
-      : { text: mine.points < 0 ? `Wrong — ${mine.points}` : "Wrong — 0", cls: "text-red-400" };
-
-  async function fileChallenge() {
-    if (challenge !== "idle") return;
-    setChallenge("filing");
-    const supabase = createClient();
-    const { error } = await supabase.rpc("file_dispute", {
-      p_game_id: identity.gameId,
-      p_question_id: reveal.questionId,
-      p_player_id: identity.playerId,
-      p_device_key: identity.deviceKey,
-    });
-    setChallenge(error ? "failed" : "filed");
-  }
+      : { text: mine.points < 0 ? `Wrong, ${mine.points}` : "Wrong, 0", cls: "text-red-400" };
 
   return (
     <div className="flex flex-col gap-2 text-center" data-testid="reveal-card">
@@ -591,24 +536,6 @@ function RevealCard({
         </p>
       )}
       <p className="text-zinc-400">Answer + source on the big screen.</p>
-      {/* The one-tap challenge (PRD §4): lands in trivia-qa's dispute queue. */}
-      {challenge === "filed" ? (
-        <p className="text-sm text-amber-300" data-testid="challenge-filed">
-          Challenge filed — a human ruling lands within 24h.
-        </p>
-      ) : challenge === "failed" ? (
-        <p className="text-sm text-zinc-400">Your team already challenged this one.</p>
-      ) : (
-        <button
-          type="button"
-          data-testid="challenge-button"
-          onClick={() => void fileChallenge()}
-          disabled={challenge === "filing"}
-          className="mx-auto text-sm text-zinc-400 underline decoration-dotted hover:text-amber-300 disabled:opacity-50"
-        >
-          Think we&apos;re wrong? Challenge this question
-        </button>
-      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { PrintButton } from "./print-button";
 
-export const metadata = { title: "Promo kit — TRIVIUM" };
+export const metadata = { title: "Promo kit, TRIVIUM" };
 
 // The promo kit (PRD §7): a printable flyer + copy-paste social captions.
 // Plain HTML with a print stylesheet — no PDF service by decision. The QR
@@ -42,9 +42,9 @@ export default async function PromoPage() {
   });
 
   const captions = [
-    `Trivia night at ${venue.name}. No app, no signup — scan the QR on the screen and you're playing. Bring your smartest friends (or your funniest).`,
+    `Trivia night at ${venue.name}. No app, no signup, scan the QR on the screen and you're playing. Bring your smartest friends (or your funniest).`,
     `The robot host doesn't do warm-ups. 4 rounds, 1 final wager, bragging rights at ${venue.name}. Phones out.`,
-    `Free trivia at ${venue.name} — join in 10 seconds from your phone. Winner gets the podium. Loser buys the nachos. House rules.`,
+    `Free trivia at ${venue.name}, join in 10 seconds from your phone. Winner gets the podium. Loser buys the nachos. House rules.`,
   ];
 
   return (
@@ -78,7 +78,7 @@ export default async function PromoPage() {
         />
         <p className="font-mono text-2xl font-bold">{joinUrl}</p>
         <p className="text-lg text-zinc-400">
-          Scan when the game is live — teams welcome, winners insufferable.
+          Scan when the game is live, teams welcome, winners insufferable.
         </p>
       </section>
 

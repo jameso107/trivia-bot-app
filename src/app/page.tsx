@@ -10,7 +10,7 @@ import { Reveal } from "./reveal";
 import { submitInquiry } from "./site-actions";
 
 export const metadata = {
-  title: "TRIVIUM — bar trivia that runs itself",
+  title: "TRIVIUM, bar trivia that runs itself",
   description:
     "A full trivia night from any computer plugged into a TV. Players join by QR in seconds, the night hosts itself, and the bar keeps the fun without the $200 host. Free for venues.",
 };
@@ -19,12 +19,12 @@ const STEPS = [
   {
     n: "1",
     title: "Plug in, pick a pack",
-    body: "Any computer, any TV, a browser. Choose from the QA'd library — or write your own pack about your bar, your regulars, your block.",
+    body: "Any computer, any TV, a browser. Choose from the QA'd library, or write your own pack about your bar, your regulars, your block.",
   },
   {
     n: "2",
     title: "The room scans one QR",
-    body: "Phones join in seconds. No app, no accounts, no friction — teams form at the table and the big screen fills with names.",
+    body: "Phones join in seconds. No app, no accounts, no friction. Names hit the big screen as players walk in.",
   },
   {
     n: "3",
@@ -51,12 +51,12 @@ const FEATURES = [
   },
   {
     title: "Players keep their glory",
-    body: "One tap after the game saves a player's night — streaks and stats follow them to any TRIVIUM bar.",
+    body: "One tap after the game saves a player's night. Streaks and stats follow them to any TRIVIUM bar.",
     big: false,
   },
   {
     title: "Built for rush hour",
-    body: "Load-tested to 150 phones on bar wifi. If the TV browser crashes, the game state survives — reopen and go.",
+    body: "Load-tested to 150 phones on bar wifi. If the TV browser crashes, the game state survives. Reopen and go.",
     big: true,
   },
 ];
@@ -64,7 +64,7 @@ const FEATURES = [
 const FAQ = [
   {
     q: "What does it cost?",
-    a: "Nothing. The core night is free for venues — packs, hosting, player joins, all of it. Premium adds bespoke packs written for your venue on request.",
+    a: "Nothing. The core night is free for venues: packs, hosting, player joins, all of it. Premium adds bespoke packs written for your venue on request.",
   },
   {
     q: "What equipment do we need?",
@@ -72,11 +72,11 @@ const FAQ = [
   },
   {
     q: "Do we need someone to host?",
-    a: "No — auto-host runs the pacing, reveals, and scores. A bartender can take manual control with the space bar whenever they want the mic moment.",
+    a: "No. Auto-host runs the pacing, reveals, and scores. A bartender can take manual control with the space bar whenever they want the mic moment.",
   },
   {
     q: "How do players join?",
-    a: "They scan the QR on the screen and they're in — browser only, no app download, no sign-up required to play.",
+    a: "They scan the QR on the screen and they're in. Browser only, no app download, no sign-up required to play.",
   },
   {
     q: "Can we use our own questions?",
@@ -84,7 +84,7 @@ const FAQ = [
   },
   {
     q: "What about wrong answers in packs?",
-    a: "Every library question ships with a source, and players can file disputes from their phones. Upheld disputes are tracked publicly in our error rate — we keep ourselves honest.",
+    a: "Every question ships with a cited source and clears an adversarial QA pass before it can go live. Corrections are tracked publicly in our error rate. We keep ourselves honest.",
   },
 ];
 
@@ -111,7 +111,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             </h1>
             <p className="enter-up max-w-md text-lg leading-8 text-zinc-400" style={{ "--stagger": "180ms" } as React.CSSProperties}>
               TRIVIUM turns any TV into a self-hosting trivia night. Players join by QR in
-              seconds — the bar keeps the packed Tuesday and skips the $200 host.
+              seconds. The bar keeps the packed Tuesday and skips the $200 host.
             </p>
             <div className="enter-up flex flex-col items-start gap-3" style={{ "--stagger": "270ms" } as React.CSSProperties}>
               <Link
@@ -150,7 +150,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                   ))}
                 </ol>
                 <div className="mt-5 flex items-center justify-between text-xs text-zinc-400">
-                  <span>7 of 9 teams answered</span>
+                  <span>7 of 9 players answered</span>
                   <span>Join: trivium.games · code TAPS</span>
                 </div>
               </div>
@@ -207,7 +207,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             <div className="hover-lift rounded-2xl border border-amber-500/40 bg-amber-400/5 p-6">
               <h3 className="text-lg font-bold text-amber-300">Made in Detroit</h3>
               <p className="mt-2 leading-7 text-zinc-400">
-                Piloting across Metro Detroit bars now — early venues shape the roadmap.
+                Piloting across Metro Detroit bars now. Early venues shape the roadmap.
               </p>
             </div>
           </div>
@@ -245,7 +245,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 </p>
                 <p className="mt-2 text-4xl font-black text-zinc-300">Bespoke</p>
                 <p className="mt-5 leading-7 text-zinc-400">
-                  Custom packs researched and written for your venue on request — your theme
+                  Custom packs researched and written for your venue on request: your theme
                   nights, your anniversary specials, your crowd. Early pilot venues get them
                   comped.
                 </p>
@@ -291,7 +291,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 data-testid="inquiry-sent"
                 className="mx-auto mt-6 max-w-md rounded-xl border border-emerald-900 bg-emerald-950 px-5 py-4 text-emerald-300"
               >
-                Got it — a real note is on its way. Talk soon.
+                Got it, a real note is on its way. Talk soon.
               </p>
             ) : (
               <form

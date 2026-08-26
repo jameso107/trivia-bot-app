@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 // Game-default keys a venue can set; merged into each created game's settings.
-const GAME_DEFAULT_KEYS = ["speed_bonus", "team_edits", "auto_host", "tts_enabled", "music_enabled"] as const;
+const GAME_DEFAULT_KEYS = ["speed_bonus", "auto_host", "tts_enabled", "music_enabled"] as const;
 
 export async function startGame(packId: string) {
   const supabase = await createClient();
@@ -29,7 +29,7 @@ export async function startGame(packId: string) {
   });
   if (error || !gameId) {
     const message = error?.message?.includes("not a venue member")
-      ? "Your account isn't attached to a venue yet — run the setup above."
+      ? "Your account isn't attached to a venue yet, run the setup above."
       : (error?.message ?? "could not create the game");
     redirect(`/dashboard?error=${encodeURIComponent(message)}`);
   }

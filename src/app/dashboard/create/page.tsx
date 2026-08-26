@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PackBuilder } from "./builder";
 
-export const metadata = { title: "Create a pack — TRIVIUM" };
+export const metadata = { title: "Create a pack, TRIVIUM" };
 
 export default async function CreatePackPage({ searchParams }: PageProps<"/dashboard/create">) {
   const params = await searchParams;
@@ -28,7 +28,7 @@ export default async function CreatePackPage({ searchParams }: PageProps<"/dashb
           <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">TRIVIUM</p>
           <h1 className="text-3xl font-bold text-zinc-50">Your own trivia</h1>
           <p className="mt-1 text-sm text-zinc-400">
-            Write it your way — inside jokes, regulars&apos; names, last week&apos;s drama. Five
+            Write it your way, inside jokes, regulars&apos; names, last week&apos;s drama. Five
             questions minimum; it&apos;s only ever visible to your venue.
           </p>
         </div>

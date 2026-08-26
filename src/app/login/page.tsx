@@ -3,7 +3,7 @@ import { displayFont } from "../fonts";
 import { sendMagicLink } from "./actions";
 import { ActionButton } from "../action-button";
 
-export const metadata = { title: "Sign in — TRIVIUM" };
+export const metadata = { title: "Sign in · TRIVIUM" };
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;

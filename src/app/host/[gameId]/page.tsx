@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 import { createClient } from "@/lib/supabase/server";
 import { Console } from "./console";
 
-export const metadata = { title: "Host console — TRIVIUM" };
+export const metadata = { title: "Host console, TRIVIUM" };
 
 // The TV. Auth gate is server-side: only members of the game's venue get in
 // (RLS backs the query — a non-member sees no row at all).

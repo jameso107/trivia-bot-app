@@ -11,7 +11,7 @@ import {
 } from "./actions";
 import { FirstRunWizard } from "./wizard";
 
-export const metadata = { title: "Dashboard — TRIVIUM" };
+export const metadata = { title: "Dashboard, TRIVIUM" };
 
 interface Night {
   game_id: string;
@@ -28,9 +28,8 @@ interface Night {
 const TOGGLES: Array<{ key: string; label: string; hint: string; default: boolean }> = [
   { key: "auto_host", label: "Auto-host", hint: "the console runs the night itself", default: true },
   { key: "speed_bonus", label: "Speed bonus", hint: "faster correct answers score more", default: true },
-  { key: "team_edits", label: "Team answer edits", hint: "teams can change answers until lock (3 max)", default: false },
   { key: "tts_enabled", label: "Host voice (TTS)", hint: "plays host lines aloud when audio exists", default: false },
-  { key: "music_enabled", label: "Music", hint: "synthesized soundtrack from the TV — lobby groove, question tension, podium fanfare ('m' mutes live)", default: false },
+  { key: "music_enabled", label: "Music", hint: "synthesized soundtrack from the TV, lobby groove, question tension, podium fanfare ('m' mutes live)", default: false },
 ];
 
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
@@ -38,17 +37,17 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const error = typeof params.error === "string" ? params.error : null;
   const notice =
     params.welcome === "1"
-      ? "Venue created — pick a pack and you're live."
+      ? "Venue created, pick a pack and you're live."
       : params.saved === "1"
         ? "Settings saved."
         : params.requested === "1"
-          ? "Custom pack requested — it lands in your library once it clears QA."
+          ? "Custom pack requested, it lands in your library once it clears QA."
           : params.feedback === "sent"
-            ? "Feedback sent — thank you."
+            ? "Feedback sent, thank you."
             : params.published === "1"
-              ? "Your pack is live — it's in your library below, ready to start tonight."
+              ? "Your pack is live, it's in your library below, ready to start tonight."
               : params.retired === "1"
-                ? "Pack retired — past nights keep their history."
+                ? "Pack retired, past nights keep their history."
                 : null;
 
   const supabase = await createClient();
@@ -150,7 +149,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         <h2 className="text-xl font-semibold text-zinc-200">
           Your packs{" "}
           <span className="text-sm font-normal text-zinc-400">
-            — written by you, visible only to your venue
+           , written by you, visible only to your venue
           </span>
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="own-packs">
@@ -217,7 +216,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             <span className="text-3xl text-amber-400">+</span>
             <span className="font-semibold text-zinc-200">Create your own pack</span>
             <span className="text-xs text-zinc-400">
-              your bar, your inside jokes — five questions minimum
+              your bar, your inside jokes, five questions minimum
             </span>
           </Link>
         </div>
@@ -226,7 +225,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold text-zinc-200">
           TRIVIUM library{" "}
-          <span className="text-sm font-normal text-zinc-400">— free, QA&apos;d, ready tonight</span>
+          <span className="text-sm font-normal text-zinc-400">, free, QA&apos;d, ready tonight</span>
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="pack-library">
           {(packs ?? [])
@@ -260,7 +259,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold text-zinc-200">Recent nights</h2>
         {nights.length === 0 ? (
-          <p className="text-sm text-zinc-400">No nights yet — your history builds here.</p>
+          <p className="text-sm text-zinc-400">No nights yet, your history builds here.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm" data-testid="night-history">
@@ -282,9 +281,9 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                     <td className="py-2 pr-4">{n.pack_title}</td>
                     <td className="py-2 pr-4">{n.players}</td>
                     <td className="py-2 pr-4">{n.teams}</td>
-                    <td className="py-2 pr-4">{n.winner ?? "—"}</td>
+                    <td className="py-2 pr-4">{n.winner ?? ", "}</td>
                     <td className="py-2 pr-4">
-                      {n.duration_s ? `${Math.round(n.duration_s / 60)}m` : "—"}
+                      {n.duration_s ? `${Math.round(n.duration_s / 60)}m` : ", "}
                     </td>
                     <td className="py-2">
                       {n.state === "ended" ? (
@@ -342,7 +341,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           <h2 className="text-xl font-semibold text-zinc-200">
             Custom pack{" "}
             <span className="rounded-full border border-emerald-800 px-2 py-0.5 text-xs text-emerald-400">
-              premium — comped
+              premium, comped
             </span>
           </h2>
           <form
@@ -379,7 +378,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               <ul className="mt-1 flex flex-col gap-1 text-xs text-zinc-400" data-testid="request-list">
                 {(requests ?? []).map((r) => (
                   <li key={r.id}>
-                    “{r.topic}” — <span className="text-amber-300">{r.status}</span>
+                    “{r.topic}”, <span className="text-amber-300">{r.status}</span>
                   </li>
                 ))}
               </ul>

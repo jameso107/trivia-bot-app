@@ -1,21 +1,15 @@
 // ============================================================================
-// THE SYNTHETIC NIGHT (PRD §7) — the deploy gate. 8 phones, 3 teams, 2 rounds
-// + a final wager, one mid-round reconnect. At the end, every stored score is
-// recomputed through the SAME pure scoring function the engine used and must
-// match exactly, the podium must agree, and the frozen §8 analytics taxonomy
-// must have fired.
+// THE SYNTHETIC NIGHT (PRD §7) — the deploy gate. 8 phones playing solo (each
+// player is a team-of-one under the hood), 2 rounds + a final wager, one
+// mid-round reconnect. At the end, every stored score is recomputed through
+// the SAME pure scoring function the engine used and must match exactly, the
+// podium must agree, and the frozen §8 analytics taxonomy must have fired.
 // ============================================================================
 import { expect, test } from "@playwright/test";
 import { adminClient } from "./helpers/admin";
 import { seedSyntheticNight, type SyntheticNight } from "./helpers/fixtures";
 import { loginAsHost } from "./helpers/auth";
-import {
-  advanceTo,
-  expectPlayerState,
-  joinExistingTeam,
-  joinNewTeam,
-  newPlayer,
-} from "./helpers/players";
+import { advanceTo, expectPlayerState, join, newPlayer } from "./helpers/players";
 import {
   scoreQuestion,
   type ScoringAnswer,
@@ -24,13 +18,7 @@ import { rankStandings } from "../supabase/functions/_shared/protocol.ts";
 
 test.describe.configure({ mode: "serial" });
 
-const TEAMS = {
-  bears: "Quizzly Bears",
-  newtons: "Trivia Newtons",
-  lastCall: "Last Call",
-} as const;
-
-test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", async ({
+test("the synthetic night: 8 solo players, 2 rounds + final, exact scores", async ({
   browser,
   page: hostPage,
 }) => {
@@ -46,25 +34,23 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
     timeout: 15000,
   });
 
-  // ---- 8 phones join as 3 teams ----
+  // ---- 8 phones join, every player flying solo ----
   const p1 = await newPlayer(browser, night.joinCode);
-  await joinNewTeam(p1, "Ada", TEAMS.bears);
+  await join(p1, "Ada");
   const p2 = await newPlayer(browser, night.joinCode);
-  await joinExistingTeam(p2, "Grace", TEAMS.bears);
+  await join(p2, "Grace");
   const p3 = await newPlayer(browser, night.joinCode);
-  await joinExistingTeam(p3, "Alan", TEAMS.bears);
-
+  await join(p3, "Alan");
   const p4 = await newPlayer(browser, night.joinCode);
-  await joinNewTeam(p4, "Isaac", TEAMS.newtons);
+  await join(p4, "Isaac");
   const p5 = await newPlayer(browser, night.joinCode);
-  await joinExistingTeam(p5, "Marie", TEAMS.newtons);
+  await join(p5, "Marie");
   const p6 = await newPlayer(browser, night.joinCode);
-  await joinExistingTeam(p6, "Rosalind", TEAMS.newtons);
-
+  await join(p6, "Rosalind");
   const p7 = await newPlayer(browser, night.joinCode);
-  await joinNewTeam(p7, "Norm", TEAMS.lastCall);
+  await join(p7, "Norm");
   const p8 = await newPlayer(browser, night.joinCode);
-  await joinExistingTeam(p8, "Cliff", TEAMS.lastCall);
+  await join(p8, "Cliff");
 
   await expect(hostPage.getByTestId("player-count")).toContainText("8 players", {
     timeout: 15000,
@@ -76,20 +62,17 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
   await expect(hostPage.getByTestId("question-prompt")).toHaveText(q1.prompt);
   await expectPlayerState(p1, "question");
 
-  // Q1 (multiple choice, correct = 1): Bears right, Newtons wrong, Last Call right.
+  // Q1 (multiple choice, correct = 1): Ada, Grace, Norm right; Isaac wrong;
+  // four of eight answer at all.
   await p1.getByTestId("option-1").click();
   await expect(p1.getByTestId("answer-locked")).toBeVisible({ timeout: 10000 });
-  // A teammate trying after the lock gets the team-locked message, not an answer.
-  await expect(p2.getByTestId("answer-form")).toBeVisible();
-  await p2.getByTestId("option-0").click();
-  await expect(p2.getByTestId("answer-locked")).toContainText("teammate", {
-    timeout: 10000,
-  });
+  await p2.getByTestId("option-1").click();
+  await expect(p2.getByTestId("answer-locked")).toBeVisible({ timeout: 10000 });
   await p4.getByTestId("option-0").click();
   await expect(p4.getByTestId("answer-locked")).toBeVisible({ timeout: 10000 });
   await p7.getByTestId("option-1").click();
   await expect(p7.getByTestId("answer-locked")).toBeVisible({ timeout: 10000 });
-  await expect(hostPage.getByTestId("answered-tick")).toContainText("3/3", {
+  await expect(hostPage.getByTestId("answered-tick")).toContainText("4/8", {
     timeout: 10000,
   });
 
@@ -101,7 +84,7 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
   });
   await expect(p4.getByTestId("reveal-verdict")).toContainText("Wrong");
 
-  // Q2 (true/false, correct = true): Bears + Newtons answer, Last Call sits out.
+  // Q2 (true/false, correct = true): Grace and Marie answer, six sit out.
   await advanceTo(hostPage, "question");
   await expect(hostPage.getByTestId("question-prompt")).toHaveText(q2.prompt);
   await expectPlayerState(p2, "question");
@@ -127,7 +110,7 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
   await expect(p8.getByTestId("join-form")).toHaveCount(0); // no re-join form
   await expectPlayerState(p8, "question");
 
-  // Q3 (number closest, answer 1908): Newtons exact, Bears 8 off, Last Call 108 off.
+  // Q3 (number closest, answer 1908): Rosalind exact, Alan 8 off, Cliff 108 off.
   await p3.getByTestId("number-input").fill("1900");
   await p3.getByRole("button", { name: /lock it in/i }).click();
   await expect(p3.getByTestId("answer-locked")).toBeVisible({ timeout: 10000 });
@@ -188,8 +171,8 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
     .from("game_teams")
     .select("id, name, score")
     .eq("game_id", night.gameId);
-  expect(teamRows).toHaveLength(3);
-  expect(answerRows!.length).toBe(14); // Q1:3 + Q2:2 + Q3:3 + Q4:3 + final:3
+  expect(teamRows).toHaveLength(8); // one team-of-one per player
+  expect(answerRows!.length).toBe(15); // Q1:4 + Q2:2 + Q3:3 + Q4:3 + final:3
 
   const expectedTotals = new Map<string, number>(teamRows!.map((t) => [t.id as string, 0]));
   for (const q of night.questions) {
@@ -239,7 +222,8 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
     .locator('[data-testid="leaderboard"] li')
     .evaluateAll((lis) => lis.map((li) => li.getAttribute("data-team")));
   expect(shownOrder).toEqual(expectedOrder);
-  expect(expectedOrder).toEqual([TEAMS.bears, TEAMS.lastCall, TEAMS.newtons]);
+  // No literal-order assertion: with solo players the top spots hinge on
+  // speed-bonus timing. Parity with the recomputed ranking IS the gate.
 
   // ---- the night ends ----
   await advanceTo(hostPage, "ended");
@@ -254,7 +238,7 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
   const count = (name: string) => events!.filter((e) => e.event === name).length;
   expect(count("game_started")).toBe(1);
   expect(count("player_joined")).toBe(8);
-  expect(count("team_created")).toBe(3);
+  expect(count("team_created")).toBe(8); // a team-of-one per player
   expect(count("question_revealed")).toBe(5);
   expect(count("round_completed")).toBe(2);
   expect(count("answer_submitted")).toBe(answerRows!.length);
@@ -264,7 +248,7 @@ test("the synthetic night: 8 players, 3 teams, 2 rounds + final, exact scores", 
     number
   >;
   expect(completed.players).toBe(8);
-  expect(completed.teams).toBe(3);
+  expect(completed.teams).toBe(8);
   expect(completed.questions_played).toBe(5);
   expect(completed.duration_s).toBeGreaterThanOrEqual(0);
 });

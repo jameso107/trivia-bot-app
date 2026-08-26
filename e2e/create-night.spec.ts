@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
 import { adminClient } from "./helpers/admin";
 import { seedVenueHost } from "./helpers/fixtures";
 import { loginAsHost } from "./helpers/auth";
-import { advanceTo, joinNewTeam, newPlayer } from "./helpers/players";
+import { advanceTo, join, newPlayer } from "./helpers/players";
 
 test("a venue creates a night from the library and plays it", async ({
   browser,
@@ -36,11 +36,11 @@ test("a venue creates a night from the library and plays it", async ({
   await hostPage.keyboard.press("p");
   await expect(hostPage.getByTestId("auto-status")).toHaveAttribute("data-paused", "true");
 
-  // Two phones, two teams.
+  // Two phones, solo players.
   const p1 = await newPlayer(browser, joinCode);
-  await joinNewTeam(p1, "Norm", "Baseline");
+  await join(p1, "Norm");
   const p2 = await newPlayer(browser, joinCode);
-  await joinNewTeam(p2, "Cliff", "Controls");
+  await join(p2, "Cliff");
 
   // Play the library's first question for real.
   await advanceTo(hostPage, "round_intro");
@@ -58,7 +58,7 @@ test("a venue creates a night from the library and plays it", async ({
     timeout: 15000,
   });
   await expect(p2.getByTestId("reveal-verdict")).toContainText("Wrong");
-  await expect(hostPage.getByTestId("host-line")).toBeVisible();
+  await expect(hostPage.getByTestId("reveal-teams")).toBeVisible(); // ranked standings on every reveal
 
   // Resume the auto-host: with no clicks at all, the reveal dwell should
   // carry the night to the next question by itself (M3's core bet).
@@ -68,7 +68,7 @@ test("a venue creates a night from the library and plays it", async ({
     timeout: 20000,
   });
 
-  // All-answered skip: both teams answer Q2 and the console cuts to the lock
+  // All-answered skip: both players answer Q2 and the console cuts to the lock
   // on its own — no clicks, long before the 30s deadline.
   await expect(p1.getByTestId("answer-form")).toBeVisible({ timeout: 15000 });
   await p1.getByTestId("option-3").click(); // Toto — correct

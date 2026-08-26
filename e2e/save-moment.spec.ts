@@ -8,7 +8,7 @@ import { hostAccessToken } from "./helpers/auth";
 import { advanceUntil } from "./helpers/drive";
 import { latestEmailLink } from "./helpers/mailpit";
 import { advanceGame, getGameState } from "../src/lib/game/api";
-import { joinNewTeam, newPlayer } from "./helpers/players";
+import { join, newPlayer } from "./helpers/players";
 
 test("the save moment: stats → magic link → account with attribution", async ({
   browser,
@@ -20,7 +20,7 @@ test("the save moment: stats → magic link → account with attribution", async
 
   // One phone joins and answers the first question correctly.
   const p1 = await newPlayer(browser, night.joinCode);
-  await joinNewTeam(p1, "Sam", "Solo Cup");
+  await join(p1, "Sam");
 
   await advanceGame({ gameId: night.gameId, expectedState: "lobby", accessToken: token });
   await advanceGame({ gameId: night.gameId, expectedState: "round_intro", accessToken: token });
@@ -35,7 +35,7 @@ test("the save moment: stats → magic link → account with attribution", async
 
   // The phone lands on personal stats.
   await expect(p1.getByTestId("personal-stats")).toBeVisible({ timeout: 20000 });
-  await expect(p1.getByTestId("final-standing")).toContainText("Solo Cup");
+  await expect(p1.getByTestId("final-standing")).toContainText("#1 of 1");
   await expect(p1.getByTestId("personal-stats")).toContainText("1"); // answered/correct
 
   // Save: email in, magic link out.

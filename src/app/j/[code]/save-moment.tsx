@@ -34,7 +34,7 @@ function FeedbackNudge({ gameId }: { gameId: string }) {
   if (sent) {
     return (
       <p className="text-center text-sm text-emerald-400" data-testid="player-feedback-sent">
-        Thanks — a human reads every one.
+        Thanks, a human reads every one.
       </p>
     );
   }
@@ -124,7 +124,7 @@ export function SaveMoment({ identity }: { identity: Identity }) {
         <h1 className="text-2xl font-bold">That&apos;s the night!</h1>
         {stats.teamName && (
           <p className="text-lg text-zinc-300" data-testid="final-standing">
-            {stats.teamName}: #{stats.rank} of {stats.teamsTotal} · {stats.score} pts
+            You finished #{stats.rank} of {stats.teamsTotal} · {stats.score} pts
           </p>
         )}
       </div>
@@ -141,7 +141,7 @@ export function SaveMoment({ identity }: { identity: Identity }) {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
           <dt className="text-xs uppercase tracking-wider text-zinc-400">Fastest</dt>
           <dd className="text-2xl font-black text-amber-400">
-            {stats.fastestSeconds !== null ? `${stats.fastestSeconds}s` : "—"}
+            {stats.fastestSeconds !== null ? `${stats.fastestSeconds}s` : ", "}
           </dd>
         </div>
       </dl>
@@ -150,7 +150,7 @@ export function SaveMoment({ identity }: { identity: Identity }) {
 
       {stats.alreadySaved ? (
         <p className="text-center text-emerald-400" data-testid="already-saved">
-          Saved to your account ✓ — see your nights at{" "}
+          Saved to your account ✓, see your nights at{" "}
           <a href="/me" className="underline">
             /me
           </a>

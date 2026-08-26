@@ -5,7 +5,7 @@ import { seedSyntheticNight } from "./helpers/fixtures";
 import { hostAccessToken, loginAsHost } from "./helpers/auth";
 import { advanceUntil } from "./helpers/drive";
 import { advanceGame, getGameState } from "../src/lib/game/api";
-import { joinNewTeam, newPlayer } from "./helpers/players";
+import { join, newPlayer } from "./helpers/players";
 
 test("console dies mid-reveal and comes back: state restored, night continues", async ({
   browser,
@@ -20,7 +20,7 @@ test("console dies mid-reveal and comes back: state restored, night continues", 
   await expect(hostPage.getByTestId("join-code")).toBeVisible({ timeout: 15000 });
 
   const p1 = await newPlayer(browser, night.joinCode);
-  await joinNewTeam(p1, "Ada", "Survivors");
+  await join(p1, "Ada");
 
   // Play to a reveal with an answer on the board.
   await advanceGame({ gameId: night.gameId, expectedState: "lobby", accessToken: token });

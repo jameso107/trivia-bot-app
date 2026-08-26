@@ -6,7 +6,7 @@ import { SiteFooter, SiteNav } from "../site-chrome";
 import { displayFont } from "../fonts";
 
 export const metadata = {
-  title: "Trivia night in Detroit — TRIVIUM",
+  title: "Trivia night in Detroit, TRIVIUM",
   description:
     "Weekly bar trivia across Metro Detroit: QR join from your phone, self-hosting nights, free for venues. Find a night or bring TRIVIUM to your bar.",
 };
@@ -23,7 +23,7 @@ export default function DetroitPage() {
           Trivia night in Detroit
         </h1>
         <p className="mt-5 text-lg leading-8 text-zinc-400">
-          Love trivia? Detroit-area bars run TRIVIUM nights — join a team, grab a pitcher, and
+          Love trivia? Detroit-area bars run TRIVIUM nights. Scan the QR, grab a pitcher, and
           prove your useless knowledge is actually useful. We&apos;re piloting across Metro
           Detroit now and adding venues every week.
         </p>
@@ -31,7 +31,7 @@ export default function DetroitPage() {
         <h2 className="mt-12 font-display text-2xl font-bold text-zinc-100">What a night looks like</h2>
         <ul className="mt-4 flex flex-col gap-3 leading-7 text-zinc-400">
           <li>· Quick rounds of ten with a live on-screen host and a final wager.</li>
-          <li>· Join by scanning the QR on the big screen — no app, no signup.</li>
+          <li>· Join by scanning the QR on the big screen, no app, no signup.</li>
           <li>· Answers carry sources; you can dispute a bad call from your phone.</li>
           <li>· Save your result after the game and your streak follows you to any TRIVIUM bar.</li>
         </ul>
@@ -40,7 +40,7 @@ export default function DetroitPage() {
         <p className="mt-4 leading-8 text-zinc-400">
           TRIVIUM is free for venues: the whole night runs itself from any computer plugged into
           a TV. Ten minutes from signup to your first live game, a promo kit for the door, and a
-          pack library written and fact-checked for bar play — plus a builder for your own house
+          pack library written and fact-checked for bar play, plus a builder for your own house
           questions.
         </p>
         <div className="mt-6 flex items-center gap-4">

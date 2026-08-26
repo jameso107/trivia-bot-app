@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Join the game — TRIVIUM" };
+export const metadata = { title: "Join the game · TRIVIUM" };
 
 // The flyer QR's permanent target: forwards to the venue's current game, or
 // tells you when to come back. Public — no auth, no membership.
@@ -23,7 +23,7 @@ export default async function VenueJoinPage({ params }: PageProps<"/v/[slug]">) 
       </h1>
       <p className="text-zinc-400">
         {info?.venue_name
-          ? "Scan again when the big screen says go — the game opens minutes before start."
+          ? "Scan again when the big screen says go. The game opens minutes before start."
           : "Double-check the link on the flyer."}
       </p>
     </main>
